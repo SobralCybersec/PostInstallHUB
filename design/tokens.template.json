@@ -1,0 +1,5 @@
+{
+  "_note": "N/A — PostInstallHUB has no design system or design tokens.",
+  "_reason": "PostInstallHUB is a terminal script collection. The only visual system is ANSI color codes defined in lib/colors.sh: RED, GREEN, YELLOW, BLUE, NC. There are no UI components, color palettes, typography scales, or spacing systems.",
+  "_see": "lib/colors.sh for the actual terminal color definitions."
+}

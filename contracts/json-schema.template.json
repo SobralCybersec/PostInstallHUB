@@ -1,0 +1,5 @@
+{
+  "_note": "N/A — PostInstallHUB has no structured data contracts or JSON schemas.",
+  "_reason": "PostInstallHUB is a shell script collection. All data is either terminal output (plain text) or the OS state after running the scripts. There are no JSON payloads, API request/response bodies, or event schemas.",
+  "_see": "docs/03-architecture/API.md for the CLI interface definition."
+}

@@ -1,0 +1,7 @@
+# N/A — PostInstallHUB has no HTTP API.
+#
+# PostInstallHUB is a shell script collection distributed via curl.
+# The interface is the command line, not an HTTP endpoint.
+# See docs/03-architecture/API.md for the actual CLI interface definition.
+#
+# This file is a placeholder from the project scaffold template and does not apply.
