@@ -173,6 +173,6 @@ jobs:
             echo "| Field | Value |"
             echo "|-------|-------|"
             echo "| Archive | \`${ARCHIVE}\` |"
-            echo "| SHA256 | \`$(cat "${ARCHIVE}.sha256" | cut -d' ' -f1)\` |"
+            echo "| SHA256 | \`$(cut -d' ' -f1 "${ARCHIVE}.sha256")\` |"
             echo "| URL | https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }} |"
           } >> "$GITHUB_STEP_SUMMARY"

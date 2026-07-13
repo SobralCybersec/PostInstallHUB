@@ -264,8 +264,8 @@ _step_hw_video() {
       dnf_install mesa-va-drivers-freeworld
       # 32-bit for Steam/Wine compatibility
       if rpm --eval '%{_arch}' 2>/dev/null | grep -q x86_64; then
-        dnf_install mesa-va-drivers-freeworld.i686 2>/dev/null \
-          || log_warning "mesa-va-drivers-freeworld.i686 not available — skipping 32-bit."
+        dnf_install mesa-va-drivers-freeworld.i686 2>/dev/null ||
+          log_warning "mesa-va-drivers-freeworld.i686 not available — skipping 32-bit."
       fi
       ;;
     nvidia)
@@ -284,9 +284,9 @@ _step_hw_video() {
   if sudo "$_DNF" config-manager setopt fedora-cisco-openh264.enabled=1 2>/dev/null; then
     log_success "fedora-cisco-openh264 repo enabled (dnf5 setopt)."
   else
-    sudo "$_DNF4" config-manager --enable fedora-cisco-openh264 2>/dev/null \
-      && log_success "fedora-cisco-openh264 repo enabled (dnf4)." \
-      || log_warning "Could not enable fedora-cisco-openh264 — enable in Firefox settings manually."
+    sudo "$_DNF4" config-manager --enable fedora-cisco-openh264 2>/dev/null &&
+      log_success "fedora-cisco-openh264 repo enabled (dnf4)." ||
+      log_warning "Could not enable fedora-cisco-openh264 — enable in Firefox settings manually."
   fi
 
   log_info "After reboot: enable OpenH264 plugin in Firefox → Settings → Plugins."
@@ -317,7 +317,7 @@ _step_nvidia() {
     log_warning "Secure Boot is ENABLED."
     log_warning "Full automation is not possible — MOK enrollment requires manual BIOS interaction."
     log_warning "Steps to complete manually after this script:"
-    cat << 'SB_MANUAL'
+    cat <<'SB_MANUAL'
 
   ── Secure Boot + NVIDIA (manual steps) ──────────────────────────────────
   1.  sudo dnf install kmodtool akmods mokutil openssl
@@ -381,7 +381,7 @@ _step_optimizations() {
       local src="/usr/share/applications/${_GNOME_SW_DESKTOP}"
       if [[ -f "$src" ]]; then
         cp "$src" "$autostart_file"
-        echo "X-GNOME-Autostart-enabled=false" >> "$autostart_file"
+        echo "X-GNOME-Autostart-enabled=false" >>"$autostart_file"
         log_success "GNOME Software autostart disabled (saves up to 900MB RAM)."
       else
         log_warning "${src} not found — GNOME Software may not be installed."
@@ -396,9 +396,9 @@ _step_optimizations() {
         log_info "GNOME Software search provider: already disabled."
       else
         dconf write /org/gnome/desktop/search-providers/disabled \
-          "['${_GNOME_SW_DESKTOP}']" 2>/dev/null \
-          && log_success "GNOME Software disabled as search provider." \
-          || log_warning "dconf write failed — disable Software search provider manually."
+          "['${_GNOME_SW_DESKTOP}']" 2>/dev/null &&
+          log_success "GNOME Software disabled as search provider." ||
+          log_warning "dconf write failed — disable Software search provider manually."
       fi
     fi
   else
@@ -421,7 +421,7 @@ _step_dns() {
   fi
 
   sudo mkdir -p "$dir"
-  sudo tee "$conf" > /dev/null << 'DNS_CONF'
+  sudo tee "$conf" >/dev/null <<'DNS_CONF'
 # PostInstallHUB — Cloudflare DNS over TLS
 # Cloudflare security: blocks malware domains (1.1.1.2 / 1.0.0.2)
 [Resolve]
@@ -476,7 +476,7 @@ _step_essential_packages() {
 # Manual steps banner
 # ============================================================================
 _print_manual_steps() {
-  cat << 'MANUAL'
+  cat <<'MANUAL'
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║            MANUAL STEPS — complete these yourself                ║

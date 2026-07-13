@@ -154,9 +154,9 @@ _step_yay() {
 
   log_info "Building yay-bin (makepkg as current user)..."
   # makepkg MUST NOT run as root
-  pushd "${tmp_dir}/yay-bin" > /dev/null
+  pushd "${tmp_dir}/yay-bin" >/dev/null
   makepkg -si --noconfirm
-  popd > /dev/null
+  popd >/dev/null
 
   # Post-install yay config
   yay --save --removemake --cleanafter --sudoloop
@@ -247,7 +247,7 @@ _step_security() {
       if grep -q "^# deny" "$faillock_conf" || grep -q "^deny" "$faillock_conf"; then
         sudo sed -i 's/^#\? *deny = .*/deny = 10/' "$faillock_conf"
       else
-        echo "deny = 10" | sudo tee -a "$faillock_conf" > /dev/null
+        echo "deny = 10" | sudo tee -a "$faillock_conf" >/dev/null
       fi
       log_success "faillock: deny set to 10 attempts before lock."
     fi
@@ -259,7 +259,7 @@ _step_security() {
   if [[ -f "$_SUDOERS_WHEEL" ]]; then
     log_info "sudoers wheel: already configured."
   else
-    echo "%wheel ALL=(ALL:ALL) ALL" | sudo tee "$_SUDOERS_WHEEL" > /dev/null
+    echo "%wheel ALL=(ALL:ALL) ALL" | sudo tee "$_SUDOERS_WHEEL" >/dev/null
     sudo chmod 440 "$_SUDOERS_WHEEL"
     log_success "sudoers: wheel group can sudo."
   fi
@@ -269,7 +269,7 @@ _step_security() {
     log_info "sudoers nopasswd: already set for ${USER}."
   else
     log_warning "Adding NOPASSWD sudo for ${USER} — personal machine only!"
-    echo "${USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee "$_SUDOERS_NOPASS" > /dev/null
+    echo "${USER} ALL=(ALL:ALL) NOPASSWD: ALL" | sudo tee "$_SUDOERS_NOPASS" >/dev/null
     sudo chmod 440 "$_SUDOERS_NOPASS"
     log_success "sudoers: ${USER} can sudo without password."
   fi
@@ -323,7 +323,7 @@ _configure_reflector() {
 
   [[ -f "$rconf" ]] && sudo cp "$rconf" "${rconf}.postinstallhub.bak"
 
-  sudo tee "$rconf" > /dev/null << 'REFLECTOR'
+  sudo tee "$rconf" >/dev/null <<'REFLECTOR'
 # PostInstallHUB reflector config
 # !! Edit --country to your nearest countries for best mirrors !!
 --save /etc/pacman.d/mirrorlist
@@ -358,24 +358,24 @@ _step_vm_support() {
       service_enable_now vmware-vmblock-fuse.service
       log_success "VMware guest tools installed."
       ;;
-    microsoft)  # Hyper-V
+    microsoft) # Hyper-V
       pacman_install hyperv
       service_enable_now hv_fcopy_daemon.service
       service_enable_now hv_kvp_daemon.service
       service_enable_now hv_vss_daemon.service
       log_success "Hyper-V guest services installed."
       ;;
-    oracle)  # VirtualBox
+    oracle) # VirtualBox
       pacman_install virtualbox-guest-utils
       service_enable_now vboxservice.service
       log_success "VirtualBox guest utils installed."
       ;;
-    xen)  # XCP-ng / XenServer
+    xen) # XCP-ng / XenServer
       yay_install xe-guest-utilities-xcp-ng
       service_enable_now xe-linux-distribution.service
       log_success "XCP-ng guest utilities installed."
       ;;
-    none|*)
+    none | *)
       log_info "Running on bare metal (or unknown hypervisor) — skipping VM tools."
       ;;
   esac
@@ -401,7 +401,7 @@ _step_micro() {
     log_info "micro settings.json: already configured."
   else
     [[ -f "$settings" ]] && cp "$settings" "${settings}.postinstallhub.bak"
-    cat > "$settings" << 'MICRO_SETTINGS'
+    cat >"$settings" <<'MICRO_SETTINGS'
 {
   "clipboard": "terminal",
   "colorscheme": "dracula",
@@ -425,7 +425,7 @@ MICRO_SETTINGS
     log_info "micro bindings.json: already configured."
   else
     [[ -f "$keybinds" ]] && cp "$keybinds" "${keybinds}.postinstallhub.bak"
-    cat > "$keybinds" << 'MICRO_KEYS'
+    cat >"$keybinds" <<'MICRO_KEYS'
 {
   "Ctrl-q": "Quit",
   "Ctrl-s": "Save",
@@ -460,7 +460,7 @@ _step_network() {
   fi
 
   sudo cp "$resolved_conf" "${resolved_conf}.postinstallhub.bak" 2>/dev/null || true
-  cat << 'RESOLVED' | sudo tee -a "$resolved_conf" > /dev/null
+  cat <<'RESOLVED' | sudo tee -a "$resolved_conf" >/dev/null
 
 # PostInstallHUB — DNSSEC=no
 # Disabled because DNSSEC was broken by default in systemd (September 2025)
@@ -503,9 +503,9 @@ _step_zsh() {
   fi
 
   # Install zimfw
-  if [[ -f "${HOME}/.local/share/zimfw/zimfw.zsh" ]] || \
-     [[ -f "${HOME}/.zimfw/zimfw.zsh" ]] || \
-     is_installed zimfw; then
+  if [[ -f "${HOME}/.local/share/zimfw/zimfw.zsh" ]] ||
+    [[ -f "${HOME}/.zimfw/zimfw.zsh" ]] ||
+    is_installed zimfw; then
     log_info "zimfw already installed."
   else
     log_info "Installing zimfw..."
@@ -523,7 +523,7 @@ _step_zsh() {
       # Comment out any existing prompt/theme module
       sed -i 's/^zmodule .*theme.*/# & # disabled by PostInstallHUB/' "$zimrc" 2>/dev/null || true
       sed -i 's/^zmodule eriner/#&/' "$zimrc" 2>/dev/null || true
-      echo "zmodule steeef" >> "$zimrc"
+      echo "zmodule steeef" >>"$zimrc"
       log_success ".zimrc: steeef theme added."
       log_info "Run 'zimfw install' in a new zsh session to apply."
     fi
@@ -556,7 +556,7 @@ _write_myownrc() {
 
   [[ -f "$myownrc" ]] && cp "$myownrc" "${myownrc}.postinstallhub.bak"
 
-  cat > "$myownrc" << 'MYOWNRC'
+  cat >"$myownrc" <<'MYOWNRC'
 # PostInstallHUB — .myownrc BEGIN
 # Based on github.com/DoTheEvo/ansible-arch
 # ── Aliases ──────────────────────────────────────────────────────────────────
@@ -677,7 +677,7 @@ _step_docker() {
     "max-size": "250m",
     "max-file": "3"
   }
-}' | sudo tee "$daemon_json" > /dev/null
+}' | sudo tee "$daemon_json" >/dev/null
     log_success "docker: log rotation set to 250MB × 3 files."
     sudo systemctl reload-or-restart docker.service 2>/dev/null || true
   fi
@@ -695,7 +695,10 @@ _step_lts_kernel() {
   if [[ "${POSTINSTALL_YES:-0}" != "1" ]]; then
     echo -e "Type ${BOLD}yes${NC} to continue or anything else to skip:"
     read -r confirm
-    [[ "$confirm" != "yes" ]] && { log_info "LTS kernel step skipped."; return 0; }
+    [[ "$confirm" != "yes" ]] && {
+      log_info "LTS kernel step skipped."
+      return 0
+    }
   fi
 
   pacman_install linux-lts linux-lts-headers
@@ -720,9 +723,9 @@ _step_lts_kernel() {
         if [[ -n "$stock_entry" ]]; then
           local lts_entry="/boot/loader/entries/arch-lts.conf"
           sudo cp "$stock_entry" "$lts_entry"
-          sudo sed -i 's/vmlinuz-linux$/vmlinuz-linux-lts/'   "$lts_entry"
+          sudo sed -i 's/vmlinuz-linux$/vmlinuz-linux-lts/' "$lts_entry"
           sudo sed -i 's/initramfs-linux/initramfs-linux-lts/' "$lts_entry"
-          sudo sed -i 's/^title .*/title Arch Linux LTS/'      "$lts_entry"
+          sudo sed -i 's/^title .*/title Arch Linux LTS/' "$lts_entry"
           log_success "Created systemd-boot LTS entry: ${lts_entry}"
         else
           log_warning "No existing boot entry found to base LTS entry on. Manual setup needed."
@@ -749,7 +752,7 @@ _step_lts_kernel() {
 # Manual steps banner
 # ============================================================================
 _print_manual_steps() {
-  cat << 'MANUAL'
+  cat <<'MANUAL'
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║            MANUAL STEPS — complete these yourself                ║

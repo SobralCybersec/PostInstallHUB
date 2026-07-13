@@ -96,7 +96,8 @@ flatpak_install() {
 
 # snap_install PACKAGE [flags…] — idempotent
 snap_install() {
-  local pkg="$1"; shift
+  local pkg="$1"
+  shift
   if snap list 2>/dev/null | awk '{print $1}' | grep -qx "$pkg"; then
     log_info "Snap already installed: ${pkg}"
     return 0
@@ -168,8 +169,8 @@ _step_debloat() {
 
   # Wildcard packages (must use apt-get directly — can't check with dpkg-query easily)
   for pattern in "totem*" "rhythmbox*" "librhythmbox-core*" "remmina*" "gimp*" \
-                 "gnome-photos*" "sgt-puzzles*" "evolution*" "xsane*" \
-                 "hexchat*" "thunderbird*" "cheese*" "brasero*" "lm-sensors*"; do
+    "gnome-photos*" "sgt-puzzles*" "evolution*" "xsane*" \
+    "hexchat*" "thunderbird*" "cheese*" "brasero*" "lm-sensors*"; do
     sudo apt-get --purge remove -y "$pattern" 2>/dev/null || true
   done
 
@@ -232,12 +233,12 @@ _step_timeshift() {
 # PPAs are idempotent via ppa_add().
 # ============================================================================
 _PPA_LIST=(
-  "ppa:zhangsongcui3371/fastfetch"   # Fastfetch — fast neofetch replacement
-  "ppa:danielrichter2007/grub-customizer"  # Grub Customizer
-  "ppa:papirus/papirus"              # Papirus icon theme
-  "ppa:git-core/ppa"                 # Latest stable Git
-  "ppa:sebastian-stenzel/cryptomator" # Cryptomator
-  "ppa:phoerious/keepassxc"          # KeePassXC
+  "ppa:zhangsongcui3371/fastfetch"        # Fastfetch — fast neofetch replacement
+  "ppa:danielrichter2007/grub-customizer" # Grub Customizer
+  "ppa:papirus/papirus"                   # Papirus icon theme
+  "ppa:git-core/ppa"                      # Latest stable Git
+  "ppa:sebastian-stenzel/cryptomator"     # Cryptomator
+  "ppa:phoerious/keepassxc"               # KeePassXC
 )
 
 _PPA_PACKAGES=(
@@ -251,13 +252,13 @@ _PPA_PACKAGES=(
 )
 
 _APT_PACKAGES=(
-  synaptic                # Graphical package manager
-  adb                     # Android Debug Bridge
-  inetutils-traceroute    # traceroute
-  curl                    # HTTP client
-  wget                    # File downloader
-  blueman                 # Bluetooth manager (GTK)
-  fuse3                   # FUSE3 (Cryptomator dependency)
+  synaptic             # Graphical package manager
+  adb                  # Android Debug Bridge
+  inetutils-traceroute # traceroute
+  curl                 # HTTP client
+  wget                 # File downloader
+  blueman              # Bluetooth manager (GTK)
+  fuse3                # FUSE3 (Cryptomator dependency)
 )
 
 _step_ppa_apps() {
@@ -287,10 +288,10 @@ _step_ppa_apps() {
 # STEP 7 — Flatpak apps
 # ============================================================================
 _FLATPAK_APPS=(
-  "org.gnome.baobab"                  # Disk Usage Analyzer
+  "org.gnome.baobab"                   # Disk Usage Analyzer
   "org.torproject.torbrowser-launcher" # Tor Browser
-  "org.gimp.GIMP"                     # Image editor
-  "com.obsproject.Studio"             # Screen recorder / streaming
+  "org.gimp.GIMP"                      # Image editor
+  "com.obsproject.Studio"              # Screen recorder / streaming
 )
 
 # Optional — uncomment to include:
@@ -355,7 +356,7 @@ _step_cleanup() {
 # Manual steps banner
 # ============================================================================
 _print_manual_steps() {
-  cat << 'MANUAL'
+  cat <<'MANUAL'
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║         MANUAL STEPS — complete these yourself                   ║

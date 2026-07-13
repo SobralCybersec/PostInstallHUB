@@ -89,8 +89,8 @@ _dotfiles_caelestia() {
   if ! command -v nix &>/dev/null; then
     log_info "Nix not found — installing via Determinate Systems (enables flakes by default) …"
     curl --proto '=https' --tlsv1.2 -sSf -L \
-      https://install.determinate.systems/nix \
-      | sh -s -- install --no-confirm
+      https://install.determinate.systems/nix |
+      sh -s -- install --no-confirm
 
     # Source nix into current shell session
     # shellcheck source=/dev/null
@@ -179,7 +179,7 @@ _dotfiles_zerodaygym() {
   (cd "${tmpdir}/zdg" && sudo ./install.sh)
   local exit_code=$?
 
-  if (( exit_code == 0 )); then
+  if ((exit_code == 0)); then
     log_success "ZeroDayGym Kali i3-gaps desktop installed"
     echo ""
     echo -e "${BOLD}╔══════════════════════════════════════════════╗${NC}"
@@ -250,7 +250,7 @@ step_dotfiles() {
     preset=$(_dotfiles_select_interactive)
   fi
 
-  case "${preset,,}" in   # lowercase match
+  case "${preset,,}" in # lowercase match
     none | "")
       log_info "Dotfiles: none selected — skipped"
       ;;

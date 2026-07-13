@@ -15,11 +15,11 @@ source "${_ROOT_DIR}/lib/backup.sh"
 # ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
-log_info()    { echo -e "${BLUE}[INFO]${NC}    $*"; }
+log_info() { echo -e "${BLUE}[INFO]${NC}    $*"; }
 log_success() { echo -e "${GREEN}[SUCCESS]${NC} ✓ $*"; }
 log_warning() { echo -e "${YELLOW}[WARNING]${NC} ⚠ $*"; }
-log_error()   { echo -e "${RED}[ERROR]${NC}   ✗ $*" >&2; }
-log_step()    { echo -e "\n${BOLD}${CYAN}══ $* ══${NC}"; }
+log_error() { echo -e "${RED}[ERROR]${NC}   ✗ $*" >&2; }
+log_step() { echo -e "\n${BOLD}${CYAN}══ $* ══${NC}"; }
 
 # ---------------------------------------------------------------------------
 # Guards
@@ -91,7 +91,7 @@ append_once() {
     return 0
   fi
   backup_warning "$file"
-  printf '\n%s\n' "$content" >> "$file"
+  printf '\n%s\n' "$content" >>"$file"
   log_success "Appended to ${file}: ${marker}"
 }
 

@@ -75,7 +75,7 @@ deb822_source_write() {
     log_info "apt source already exists: ${path}"
     return 0
   fi
-  sudo tee "$path" > /dev/null << "EOF"
+  sudo tee "$path" >/dev/null <<"EOF"
 $*
 EOF
   log_success "apt source written: ${path}"
@@ -148,7 +148,7 @@ _step_debmultimedia() {
   log_success "DebMultimedia keyring installed."
 
   log_info "Writing dmo.sources (DEB822)..."
-  sudo tee "$_DMO_SOURCE" > /dev/null << 'DMO'
+  sudo tee "$_DMO_SOURCE" >/dev/null <<'DMO'
 Types: deb
 URIs: https://www.deb-multimedia.org
 Suites: trixie
@@ -194,7 +194,7 @@ _step_nvidia() {
   # APT pin: NVIDIA repo takes priority over Debian packages for same pkgs
   if [[ ! -f "$_NVIDIA_PREF" ]]; then
     log_info "Setting NVIDIA repo priority (pin 900)..."
-    sudo tee "$_NVIDIA_PREF" > /dev/null << 'PREF'
+    sudo tee "$_NVIDIA_PREF" >/dev/null <<'PREF'
 Package: *
 Pin: origin https://developer.download.nvidia.com
 Pin-Priority: 900
@@ -280,7 +280,7 @@ _APT_PRODUCTIVITY=(
   fonts-bebas-neue
   gstreamer1.0-plugins-ugly
   gstreamer1.0-plugins-bad
-  gpm                     # mouse in TTY
+  gpm # mouse in TTY
 )
 
 _step_productivity() {
@@ -312,7 +312,7 @@ _step_davinci_resolve_deps() {
 
   log_success "DaVinci Resolve dependencies installed."
 
-  cat << 'DR_NOTES'
+  cat <<'DR_NOTES'
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║          DaVinci Resolve — Manual Install Notes                  ║
@@ -358,7 +358,7 @@ _FLATPAK_GAMING=(
   "com.github.Matoking.protontricks"
   "com.github.tchx84.Flatseal"
   "io.github.radiolamp.mangojuice"
-  "org.vinegarhq.Sober"               # Roblox on Linux
+  "org.vinegarhq.Sober" # Roblox on Linux
 )
 
 _step_gaming() {
@@ -378,16 +378,16 @@ _step_gaming() {
 # Removes KDE/GNOME apps not needed on a workstation
 # ============================================================================
 _DEBLOAT_PKGS=(
-  libreoffice-common   # replaced by OnlyOffice flatpak
-  akregator            # RSS reader
-  kontrast             # color contrast checker
-  kmouth               # text-to-speech
-  dragonplayer         # video player (replaced by Celluloid)
-  kmail                # email client
-  juk                  # music player
-  xterm                # legacy terminal
-  firefox-esr          # replaced by flatpak Firefox
-  konqueror            # legacy browser/file manager
+  libreoffice-common # replaced by OnlyOffice flatpak
+  akregator          # RSS reader
+  kontrast           # color contrast checker
+  kmouth             # text-to-speech
+  dragonplayer       # video player (replaced by Celluloid)
+  kmail              # email client
+  juk                # music player
+  xterm              # legacy terminal
+  firefox-esr        # replaced by flatpak Firefox
+  konqueror          # legacy browser/file manager
 )
 
 _step_debloat() {
@@ -436,7 +436,7 @@ _step_zswap() {
     sudo sed -i '/^options / s/$/ zswap.enabled=1 quiet/' "$entry"
     log_success "ZSWAP enabled in: ${entry}"
     changed=true
-  done <<< "$boot_entries"
+  done <<<"$boot_entries"
 
   if [[ "$changed" == true ]]; then
     sudo bootctl update 2>/dev/null || log_warning "bootctl update failed — run manually."
@@ -464,7 +464,7 @@ _step_cleanup() {
 # Manual steps banner
 # ============================================================================
 _print_manual_steps() {
-  cat << 'MANUAL'
+  cat <<'MANUAL'
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║         MANUAL STEPS — complete these yourself                   ║

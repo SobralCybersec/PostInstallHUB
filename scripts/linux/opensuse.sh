@@ -94,7 +94,7 @@ _require_opensuse_family() {
   local actual
   actual="$(grep -oP '(?<=^ID=)[^\n]+' /etc/os-release 2>/dev/null | tr -d '"' || echo unknown)"
   case "$actual" in
-    opensuse-leap|opensuse-tumbleweed|opensuse|suse)
+    opensuse-leap | opensuse-tumbleweed | opensuse | suse)
       return 0
       ;;
     *)

@@ -58,19 +58,19 @@ pick_dotfiles_gui() {
   local chosen=""
 
   if command -v rofi &>/dev/null && _picker_has_display; then
-    chosen=$(printf '%s\n' "${choices[@]}" \
-      | rofi -dmenu \
-             -p "PostInstallHUB › Dotfiles" \
-             -theme-str 'window {width: 600px;}' \
-             -mesg "Select dotfiles preset" \
+    chosen=$(printf '%s\n' "${choices[@]}" |
+      rofi -dmenu \
+        -p "PostInstallHUB › Dotfiles" \
+        -theme-str 'window {width: 600px;}' \
+        -mesg "Select dotfiles preset" \
         2>/dev/null) || true
 
   elif command -v fzf &>/dev/null && _picker_has_tty; then
-    chosen=$(printf '%s\n' "${choices[@]}" \
-      | fzf --prompt="PostInstallHUB › Dotfiles: " \
-            --height=40% \
-            --border \
-            --header="Select a dotfiles preset (↑↓ navigate, Enter select)" \
+    chosen=$(printf '%s\n' "${choices[@]}" |
+      fzf --prompt="PostInstallHUB › Dotfiles: " \
+        --height=40% \
+        --border \
+        --header="Select a dotfiles preset (↑↓ navigate, Enter select)" \
         2>/dev/null) || true
 
   else
@@ -82,7 +82,10 @@ pick_dotfiles_gui() {
     return 0
   fi
 
-  [[ -z "$chosen" ]] && { echo ""; return 0; }
+  [[ -z "$chosen" ]] && {
+    echo ""
+    return 0
+  }
 
   _picker_strip "$chosen"
 }
@@ -99,19 +102,19 @@ pick_flags_gui() {
   local -a flags=()
   case "$distro" in
     ubuntu | zorin | linuxmint | pop | elementary | neon)
-      flags=( UBUNTU_NVIDIA UBUNTU_DEBLOAT UBUNTU_SNAP )
+      flags=(UBUNTU_NVIDIA UBUNTU_DEBLOAT UBUNTU_SNAP)
       ;;
     arch | manjaro)
-      flags=( ARCH_DOCKER ARCH_LTS )
+      flags=(ARCH_DOCKER ARCH_LTS)
       ;;
     endeavouros | cachyos | garuda)
-      flags=( ENDEAVOUR_GAMING ENDEAVOUR_PLYMOUTH ENDEAVOUR_WAYDROID ENDEAVOUR_FISH )
+      flags=(ENDEAVOUR_GAMING ENDEAVOUR_PLYMOUTH ENDEAVOUR_WAYDROID ENDEAVOUR_FISH)
       ;;
     fedora)
-      flags=( FEDORA_NVIDIA FEDORA_CUDA FEDORA_DNS )
+      flags=(FEDORA_NVIDIA FEDORA_CUDA FEDORA_DNS)
       ;;
     debian)
-      flags=( DEBIAN_NVIDIA DEBIAN_NVIDIA_CUDA DEBIAN_GAMING DEBIAN_DEBLOAT DEBIAN_ZSWAP )
+      flags=(DEBIAN_NVIDIA DEBIAN_NVIDIA_CUDA DEBIAN_GAMING DEBIAN_DEBLOAT DEBIAN_ZSWAP)
       ;;
     kali | *)
       # kali: no extra bool flags
@@ -120,25 +123,28 @@ pick_flags_gui() {
       ;;
   esac
 
-  (( ${#flags[@]} == 0 )) && { echo ""; return 0; }
+  ((${#flags[@]} == 0)) && {
+    echo ""
+    return 0
+  }
 
   local selected=""
 
   if command -v rofi &>/dev/null && _picker_has_display; then
-    selected=$(printf '%s\n' "${flags[@]}" \
-      | rofi -dmenu \
-             -multi-select \
-             -p "PostInstallHUB › Options" \
-             -mesg "Space to multi-select, Enter to confirm" \
+    selected=$(printf '%s\n' "${flags[@]}" |
+      rofi -dmenu \
+        -multi-select \
+        -p "PostInstallHUB › Options" \
+        -mesg "Space to multi-select, Enter to confirm" \
         2>/dev/null) || true
 
   elif command -v fzf &>/dev/null && _picker_has_tty; then
-    selected=$(printf '%s\n' "${flags[@]}" \
-      | fzf --multi \
-            --prompt="PostInstallHUB › Options: " \
-            --height=60% \
-            --border \
-            --header="Tab to multi-select, Enter to confirm" \
+    selected=$(printf '%s\n' "${flags[@]}" |
+      fzf --multi \
+        --prompt="PostInstallHUB › Options: " \
+        --height=60% \
+        --border \
+        --header="Tab to multi-select, Enter to confirm" \
         2>/dev/null) || true
 
   else

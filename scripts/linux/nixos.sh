@@ -55,7 +55,7 @@ nix_config_append() {
   fi
 
   backup_warning "$_NIXOS_CONF"
-  printf '\n%s\n' "$snippet" | sudo tee -a "$_NIXOS_CONF" > /dev/null
+  printf '\n%s\n' "$snippet" | sudo tee -a "$_NIXOS_CONF" >/dev/null
   log_success "configuration.nix: appended '${marker}'"
   _NIXOS_CONFIG_CHANGED=1
 }
@@ -118,7 +118,7 @@ _step_flakes() {
     log_info "Rebuilding to activate flakes…"
     sudo nixos-rebuild switch
     log_success "nixos-rebuild switch: flakes enabled"
-    _NIXOS_CONFIG_CHANGED=0  # this rebuild consumed the pending change
+    _NIXOS_CONFIG_CHANGED=0 # this rebuild consumed the pending change
   fi
 }
 
@@ -187,7 +187,7 @@ _step_home_manager() {
 _step_essential_pkgs() {
   log_step "5 · Essential Packages (advisory)"
 
-  cat << 'PKGS'
+  cat <<'PKGS'
 
   Add these to environment.systemPackages in /etc/nixos/configuration.nix:
 
@@ -243,7 +243,7 @@ _step_rebuild() {
 # Manual steps banner
 # ============================================================================
 _print_manual_steps() {
-  cat << 'MANUAL'
+  cat <<'MANUAL'
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║            MANUAL STEPS — complete these yourself                ║

@@ -89,7 +89,7 @@ main() {
       source "${SCRIPT_DIR}/scripts/linux/kali.sh"
       run_install
       ;;
-    ubuntu|zorin|linuxmint|pop|elementary|neon)
+    ubuntu | zorin | linuxmint | pop | elementary | neon)
       source "${SCRIPT_DIR}/scripts/linux/ubuntu.sh"
       run_install
       ;;
@@ -97,11 +97,11 @@ main() {
       source "${SCRIPT_DIR}/scripts/linux/debian.sh"
       run_install
       ;;
-    arch|manjaro)
+    arch | manjaro)
       source "${SCRIPT_DIR}/scripts/linux/arch.sh"
       run_install
       ;;
-    endeavouros|cachyos|garuda)
+    endeavouros | cachyos | garuda)
       source "${SCRIPT_DIR}/scripts/linux/endeavour.sh"
       run_install
       ;;
@@ -109,7 +109,7 @@ main() {
       source "${SCRIPT_DIR}/scripts/linux/fedora.sh"
       run_install
       ;;
-    opensuse-leap|opensuse-tumbleweed|opensuse)
+    opensuse-leap | opensuse-tumbleweed | opensuse)
       source "${SCRIPT_DIR}/scripts/linux/opensuse.sh"
       run_install
       ;;

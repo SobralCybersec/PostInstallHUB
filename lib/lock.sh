@@ -14,7 +14,7 @@ acquire_lock() {
     echo -e "        Stale lock? Delete it and re-run:  rm -f ${LOCK_FILE}"
     exit 3
   fi
-  echo "$$" > "$LOCK_FILE"
+  echo "$$" >"$LOCK_FILE"
   # Release on any exit (success, error, signal)
   trap 'rm -f "$LOCK_FILE"' EXIT INT TERM
 }

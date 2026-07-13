@@ -37,15 +37,15 @@ source "${_ENDEAVOUR_SCRIPT_DIR}/../lib/shells.sh"
 # ============================================================================
 _require_arch_family() {
   local actual
-  actual="$(grep -oP '(?<=^ID=)[^\n]+' /etc/os-release 2>/dev/null \
-            | tr -d '"' || echo unknown)"
+  actual="$(grep -oP '(?<=^ID=)[^\n]+' /etc/os-release 2>/dev/null |
+    tr -d '"' || echo unknown)"
   case "$actual" in
-    arch|endeavouros|cachyos|manjaro|garuda)
+    arch | endeavouros | cachyos | manjaro | garuda)
       log_info "OS detected: ${actual} (Arch family — OK)"
       ;;
     *)
       log_error "Wrong OS family: got '${actual}'." \
-                "Expected one of: arch, endeavouros, cachyos, manjaro, garuda."
+        "Expected one of: arch, endeavouros, cachyos, manjaro, garuda."
       exit 5
       ;;
   esac
@@ -54,8 +54,8 @@ _require_arch_family() {
 # Returns 0 (true) if running on Manjaro
 _is_manjaro() {
   local id
-  id="$(grep -oP '(?<=^ID=)[^\n]+' /etc/os-release 2>/dev/null \
-        | tr -d '"' || echo unknown)"
+  id="$(grep -oP '(?<=^ID=)[^\n]+' /etc/os-release 2>/dev/null |
+    tr -d '"' || echo unknown)"
   [[ "$id" == "manjaro" ]]
 }
 
@@ -160,8 +160,8 @@ _step_mirrors() {
     local mtime now age
     mtime="$(stat -c %Y "$mirrorlist")"
     now="$(date +%s)"
-    age=$(( now - mtime ))
-    if (( age < 86400 )); then
+    age=$((now - mtime))
+    if ((age < 86400)); then
       log_info "Mirrorlist updated less than 24 h ago (${age}s) — skipping reflector."
       return 0
     fi
@@ -200,9 +200,9 @@ _step_yay() {
   git clone --depth=1 https://aur.archlinux.org/yay.git "${tmp_dir}/yay"
 
   log_info "Building yay (makepkg as current user — must not be root)..."
-  pushd "${tmp_dir}/yay" > /dev/null
+  pushd "${tmp_dir}/yay" >/dev/null
   makepkg -si --noconfirm
-  popd > /dev/null
+  popd >/dev/null
 
   yay --save --removemake --cleanafter --sudoloop
   log_success "yay installed: $(yay --version 2>/dev/null | head -1)"
@@ -233,8 +233,8 @@ _step_chaotic_aur() {
 
   log_info "Appending [chaotic-aur] section to ${conf}..."
   sudo cp "$conf" "${conf}.postinstallhub.bak"
-  printf '\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist\n' \
-    | sudo tee -a "$conf" > /dev/null
+  printf '\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist\n' |
+    sudo tee -a "$conf" >/dev/null
 
   sudo pacman -Syy --noconfirm
   log_success "Chaotic-AUR repository added and database synced."
@@ -388,7 +388,7 @@ _step_fish() {
     if grep -qF "$fish_path" /etc/shells 2>/dev/null; then
       log_info "fish already in /etc/shells."
     else
-      echo "$fish_path" | sudo tee -a /etc/shells > /dev/null
+      echo "$fish_path" | sudo tee -a /etc/shells >/dev/null
       log_success "fish added to /etc/shells: ${fish_path}"
     fi
     log_success "Fish shell ready."
@@ -449,9 +449,9 @@ _step_flatpak() {
       log_info "Flatpak already installed: ${app}"
     else
       log_info "Installing Flatpak app: ${app}"
-      sudo flatpak install -y flathub "$app" 2>/dev/null \
-        && log_success "Installed: ${app}" \
-        || log_warning "Failed to install ${app} — skipping."
+      sudo flatpak install -y flathub "$app" 2>/dev/null &&
+        log_success "Installed: ${app}" ||
+        log_warning "Failed to install ${app} — skipping."
     fi
   done
 
@@ -552,8 +552,8 @@ _step_gaming() {
   # Auto-detect GPU
   local gpu="unknown"
   if command -v lspci &>/dev/null; then
-    lspci 2>/dev/null | grep -qiE 'amd|radeon'              && gpu="amd"
-    lspci 2>/dev/null | grep -qi nvidia                      && gpu="nvidia"
+    lspci 2>/dev/null | grep -qiE 'amd|radeon' && gpu="amd"
+    lspci 2>/dev/null | grep -qi nvidia && gpu="nvidia"
     lspci 2>/dev/null | grep -qiE 'intel.*graphics|intel.*uhd' && gpu="intel"
   fi
   log_info "GPU detected: ${gpu}"
@@ -562,7 +562,7 @@ _step_gaming() {
   case "$gpu" in
     amd)
       pacman_install lib32-mesa vulkan-radeon lib32-vulkan-radeon \
-                     vulkan-icd-loader lib32-vulkan-icd-loader
+        vulkan-icd-loader lib32-vulkan-icd-loader
       log_success "AMD Vulkan + lib32 drivers installed."
       ;;
     nvidia)
@@ -593,7 +593,7 @@ _step_gaming() {
 # Manual steps banner
 # ============================================================================
 _print_manual_steps() {
-  cat << 'MANUAL'
+  cat <<'MANUAL'
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║         MANUAL STEPS — complete these yourself                   ║

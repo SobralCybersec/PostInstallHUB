@@ -79,7 +79,7 @@ _step_aliases() {
 
   backup_warning "$shell_rc"
 
-  cat >> "$shell_rc" << 'ALIASES'
+  cat >>"$shell_rc" <<'ALIASES'
 
 # PostInstallHUB — Kali aliases BEGIN
 # ── Directory shortcuts ──────────────────────────────────────────
@@ -152,7 +152,7 @@ _step_zsh_autosuggest() {
   fi
 
   backup_warning "$shell_rc"
-  cat >> "$shell_rc" << 'AUTOSUGGEST'
+  cat >>"$shell_rc" <<'AUTOSUGGEST'
 
 # PostInstallHUB — zsh-autosuggestions
 source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
@@ -257,8 +257,8 @@ _step_recon_tools() {
 
   # bat — binary name differs on some Kali versions
   if ! is_installed bat && ! is_installed batcat; then
-    apt_install bat 2>/dev/null || apt_install batcat 2>/dev/null \
-      || log_warning "bat/batcat not available — skipping."
+    apt_install bat 2>/dev/null || apt_install batcat 2>/dev/null ||
+      log_warning "bat/batcat not available — skipping."
   fi
   # Create 'bat' alias if only batcat is present
   if is_installed batcat && ! is_installed bat; then
@@ -304,7 +304,7 @@ _step_github_tools() {
     [shosubgo]="https://github.com/incogbyte/shosubgo.git"
     [SubDomainizer]="https://github.com/nsonaniya2010/SubDomainizer.git"
     [dnmasscan]="https://github.com/rastating/dnmasscan.git"
-    [dorks-eye]="https://github.com/BullsEye0/dorks-eye.git"
+    [dorks - eye]="https://github.com/BullsEye0/dorks-eye.git"
     [blue_eye]="https://github.com/BullsEye0/blue_eye.git"
     [ghost_eye]="https://github.com/BullsEye0/ghost_eye.git"
   )
@@ -341,7 +341,7 @@ _step_go_tools() {
     log_info "Go PATH already in ${shell_rc}."
   else
     backup_warning "$shell_rc"
-    cat >> "$shell_rc" << 'GOPATH'
+    cat >>"$shell_rc" <<'GOPATH'
 
 # PostInstallHUB — Go PATH
 export PATH=$PATH:$HOME/go/bin
@@ -372,9 +372,9 @@ GOPATH
       log_info "Go tool already installed: ${bin_name}"
     else
       log_info "go install ${tool_path}"
-      go install "$tool_path" \
-        && log_success "Installed: ${bin_name}" \
-        || log_warning "Failed: ${tool_path} — check your network / Go version."
+      go install "$tool_path" &&
+        log_success "Installed: ${bin_name}" ||
+        log_warning "Failed: ${tool_path} — check your network / Go version."
     fi
   done
 }
@@ -383,7 +383,7 @@ GOPATH
 # Manual steps summary (printed at end)
 # ============================================================================
 _print_manual_steps() {
-  cat << 'MANUAL'
+  cat <<'MANUAL'
 
 ╔══════════════════════════════════════════════════════════════════╗
 ║            MANUAL STEPS — complete these yourself                ║
