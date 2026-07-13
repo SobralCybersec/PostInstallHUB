@@ -345,7 +345,7 @@ _step_cleanup() {
   # Snap (if present)
   if is_installed snap; then
     sudo snap refresh 2>/dev/null || true
-    sudo rm -rf /var/lib/snapd/cache/* 2>/dev/null || true
+    sudo find /var/lib/snapd/cache -mindepth 1 -delete 2>/dev/null || true
   fi
 
   log_success "System clean."
