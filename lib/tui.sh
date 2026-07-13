@@ -6,8 +6,11 @@
 # Shows a numbered [x] / [●] menu — type a number to toggle, Enter to start.
 #
 # Behaviour:
-#   POSTINSTALL_YES=1 → skip TUI entirely (CI / batch mode)
-#   Selecting a flag  → exports the env var for the distro script to consume
+#   POSTINSTALL_YES=1          → skip TUI entirely (CI / batch mode)
+#   POSTINSTALL_PICKER=auto    → try GUI picker first (rofi > fzf), fall back to text TUI (default)
+#   POSTINSTALL_PICKER=tui     → force text TUI, skip GUI picker entirely
+#   POSTINSTALL_PICKER=gui     → force GUI picker (exit 1 if rofi/fzf unavailable)
+#   Selecting a flag           → exports the env var for the distro script to consume
 #
 # Items per distro:
 #   All     : POSTINSTALL_YES checkbox + 3 dotfile radio buttons
@@ -21,6 +24,10 @@
 
 [[ -n "${_TUI_LOADED:-}" ]] && return 0
 _TUI_LOADED=1
+
+_TUI_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/picker.sh
+source "${_TUI_DIR}/picker.sh"
 
 # ── Render ─────────────────────────────────────────────────────────────────────
 _tui_render() {
@@ -108,6 +115,17 @@ run_config_tui() {
     return 0
   fi
 
+  # ── GUI picker (rofi > fzf) — dotfiles pre-selection ──────────────────────────
+  if [[ "${POSTINSTALL_PICKER:-auto}" != "tui" ]]; then
+    local gui_dot
+    gui_dot="$(pick_dotfiles_gui "$distro" 2>/dev/null || true)"
+    if [[ -n "$gui_dot" ]]; then
+      export POSTINSTALL_DOTFILES="$gui_dot"
+      log_info "GUI picker selected dotfiles: ${gui_dot}"
+      # Still run text TUI for bool flags unless POSTINSTALL_YES=1
+    fi
+  fi
+
   # ── Bool flags (ordered; parallel arrays) ─────────────────────────────────────
   local -a bkeys=() bvals=() bdescs=()
 
@@ -166,6 +184,24 @@ run_config_tui() {
         "Steam · Heroic · MangoHud via Flatpak"
         "Remove LibreOffice · KMail · Juk · Dragon"
         "Enable ZSWAP kernel parameter (systemd-boot)"
+      )
+      ;;
+    opensuse-leap | opensuse-tumbleweed | opensuse)
+      bkeys+=( OPENSUSE_NVIDIA   OPENSUSE_GAMING   OPENSUSE_PACKMAN )
+      bvals+=( 0                 0                 0                )
+      bdescs+=(
+        "NVIDIA proprietary drivers (nvidia-glG06 or nvidia-open)"
+        "Steam · Lutris · GameMode via Packman/Flatpak"
+        "Add Packman repo + switch multimedia codecs"
+      )
+      ;;
+    nixos)
+      bkeys+=( NIXOS_UNFREE   NIXOS_FLAKES   NIXOS_HOME_MANAGER )
+      bvals+=( 0              0              0                   )
+      bdescs+=(
+        "Allow unfree packages (nixpkgs.config.allowUnfree)"
+        "Enable Nix flakes + nix-command experimental features"
+        "Install Home Manager as a NixOS module"
       )
       ;;
     # kali: no extra bool flags beyond POSTINSTALL_YES

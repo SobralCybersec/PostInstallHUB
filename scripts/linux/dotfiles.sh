@@ -9,7 +9,8 @@
 #   POSTINSTALL_DOTFILES=none|jakoolit|caelestia|zerodaygym
 #     none        — skip dotfiles entirely (default when POSTINSTALL_YES=1)
 #     jakoolit    — LinuxBeginnings/Hyprland-Dots dispatcher
-#                   Supported: Arch · Fedora · Ubuntu · Debian · OpenSUSE
+#                   Supported: Arch · Fedora · Ubuntu · Debian · OpenSUSE · NixOS
+#                   NixOS is a supported distro (listed in LinuxBeginnings/Hyprland-Dots)
 #                   Detects distro, clones sub-repo, runs its install.sh
 #     caelestia   — caelestia-dots/shell (Quickshell desktop for Hyprland)
 #                   Arch/EndeavourOS: installs via AUR (yay)

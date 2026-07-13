@@ -29,6 +29,7 @@ set -euo pipefail
 _ENDEAVOUR_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${_ENDEAVOUR_SCRIPT_DIR}/common.sh"
 source "${_ENDEAVOUR_SCRIPT_DIR}/dotfiles.sh"
+source "${_ENDEAVOUR_SCRIPT_DIR}/../lib/shells.sh"
 
 # ============================================================================
 # OS family guard — require Arch-based distro
@@ -366,38 +367,34 @@ plugins=(git zsh-autosuggestions zsh-syntax-highlighting)"
 
 # ============================================================================
 # STEP 7 — Fish shell
-#   Always installed; fisher only configured when ENDEAVOUR_FISH=1
+#   Delegates full setup to lib/shells.sh::setup_fish().
+#   setup_fish() handles: install → /etc/shells → chsh → fisher → plugins →
+#   ~/.config/fish/conf.d/postinstallhub.fish
+#
+#   The chsh + full plugin setup only runs when ENDEAVOUR_FISH=1; when the
+#   flag is off we still install the package and register it in /etc/shells so
+#   the user can switch manually, matching the original behaviour.
 # ============================================================================
 _step_fish() {
-  log_step "7 · Fish Shell"
-
-  pacman_install fish
-
-  # Add fish to /etc/shells idempotently
-  local fish_path
-  fish_path="$(command -v fish)"
-  if grep -qF "$fish_path" /etc/shells 2>/dev/null; then
-    log_info "fish already in /etc/shells."
-  else
-    echo "$fish_path" | sudo tee -a /etc/shells > /dev/null
-    log_success "fish added to /etc/shells: ${fish_path}"
-  fi
-
-  # Configure fisher plugin manager only when ENDEAVOUR_FISH=1
   if [[ "${ENDEAVOUR_FISH:-0}" == "1" ]]; then
-    if fish -c "type -q fisher" &>/dev/null 2>&1; then
-      log_info "fisher already installed."
+    # Full setup: install + chsh + fisher + plugins + config
+    setup_fish
+  else
+    # Minimal: install fish + register in /etc/shells only
+    log_step "7 · Fish Shell (install only — set ENDEAVOUR_FISH=1 for full setup)"
+    pacman_install fish
+    local fish_path
+    fish_path="$(command -v fish)"
+    if grep -qF "$fish_path" /etc/shells 2>/dev/null; then
+      log_info "fish already in /etc/shells."
     else
-      log_info "Installing fisher plugin manager..."
-      fish -c "curl -sL \
-        https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish \
-        | source && fisher install jorgebucaran/fisher"
-      log_success "fisher installed."
+      echo "$fish_path" | sudo tee -a /etc/shells > /dev/null
+      log_success "fish added to /etc/shells: ${fish_path}"
     fi
+    log_success "Fish shell ready."
+    log_info "To set fish as default: chsh -s ${fish_path}"
+    log_info "For full fisher + plugin setup, re-run with ENDEAVOUR_FISH=1."
   fi
-
-  log_success "Fish shell ready."
-  log_info "To set fish as default: chsh -s ${fish_path}"
 }
 
 # ============================================================================
