@@ -45,7 +45,7 @@ safe to run on a clean OS install and should be idempotent (safe to re-run).
 docker run --rm -it ubuntu:22.04 bash
 # Inside container:
 apt-get update && apt-get install -y curl
-curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/main/install.sh | bash
 
 # Arch
 docker run --rm -it archlinux:latest bash

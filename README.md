@@ -7,13 +7,13 @@ One command to set up a fresh Linux or Windows installation.
 ### Linux
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/main/install.sh | bash
 ```
 
 ### Windows
 
 Download and run `setup.cmd` (or `setup.ps1`) from the
-[latest release](https://github.com/matheusgomescosta/PostInstallHUB/releases).
+[latest release](https://github.com/SobralCybersec/PostInstallHUB/releases).
 
 ## What it does
 

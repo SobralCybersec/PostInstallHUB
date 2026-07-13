@@ -33,13 +33,13 @@ supersedes: null
 Pin to a specific tag (recommended for stability):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/v1.0.0/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/v1.0.0/install.sh | bash
 ```
 
 Always-latest (tracks `main`):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/main/install.sh | bash
 ```
 
 The README always shows the current stable tag URL. Update it when the stable

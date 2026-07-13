@@ -24,7 +24,7 @@ PostInstallHUB's supply chain is intentionally minimal. There is no build pipeli
 ```text
 Matheus writes bash scripts
        ↓
-Committed to github.com/matheusgomescosta/PostInstallHUB (Matheus-controlled)
+Committed to github.com/SobralCybersec/PostInstallHUB (Matheus-controlled)
        ↓
 User runs: curl -fsSL https://raw.githubusercontent.com/.../install.sh | bash
        ↓

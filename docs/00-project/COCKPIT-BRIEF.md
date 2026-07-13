@@ -21,7 +21,7 @@ project:
   type: "shell script collection"
   problem: "Fresh OS installs leave users with bad defaults, missing tools, and unconfigured shells. Setup is tedious and error-prone to repeat across machines or distros."
   solution: "Single curl one-liner that auto-detects OS and distro, then runs the right post-install script: packages, dotfiles, system tweaks."
-  install_command: "curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/main/install.sh | bash"
+  install_command: "curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/main/install.sh | bash"
   platform:
     - "Ubuntu / Debian (apt)"
     - "Arch Linux (pacman)"
@@ -30,7 +30,7 @@ project:
     - "Windows (winget + CMD/batch, PowerShell variant)"
   owner: "Matheus"
   phase: "MVP / greenfield"
-  repository: "https://github.com/matheusgomescosta/PostInstallHUB"
+  repository: "https://github.com/SobralCybersec/PostInstallHUB"
   version: "0.1.0"
   database: false
   api: false

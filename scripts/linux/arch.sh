@@ -16,12 +16,16 @@
 # Optional env flags:
 #   ARCH_DOCKER=1      — also run _step_docker
 #   ARCH_LTS=1         — also run _step_lts_kernel
-#   POSTINSTALL_YES=1  — non-interactive (no prompts)
+#   POSTINSTALL_YES=1  — non-interactive (no prompts); skips dotfiles
+#   POSTINSTALL_DOTFILES=none|jakoolit|caelestia
+#     jakoolit   — Hyprland desktop (LinuxBeginnings/Hyprland-Dots, Arch-supported)
+#     caelestia  — Quickshell Hyprland desktop (yay: caelestia-shell-git)
 # =============================================================================
 set -euo pipefail
 
 _ARCH_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${_ARCH_SCRIPT_DIR}/common.sh"
+source "${_ARCH_SCRIPT_DIR}/dotfiles.sh"
 
 # ============================================================================
 # Arch-specific package helpers (pacman doesn't have apt_install equivalent)
@@ -824,6 +828,8 @@ run_install() {
   if [[ "${ARCH_LTS:-0}" == "1" ]]; then
     _step_lts_kernel
   fi
+
+  step_dotfiles
 
   echo ""
   log_success "All automated steps complete!"

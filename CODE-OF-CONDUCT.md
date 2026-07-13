@@ -11,7 +11,7 @@ last_reviewed: "2026-07-13"
 PostInstallHUB is a personal solo project. External contributions are not accepted.
 
 If you discover a security vulnerability, please open a GitHub Issue or contact
-the maintainer via GitHub at https://github.com/matheusgomescosta.
+the maintainer via GitHub at https://github.com/SobralCybersec.
 
 ## Usage
 

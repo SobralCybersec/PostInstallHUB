@@ -13,7 +13,7 @@ Completed answers for PostInstallHUB.
 ## Identity
 
 - **Project name:** PostInstallHUB
-- **Repository:** github.com/matheusgomescosta/PostInstallHUB
+- **Repository:** github.com/SobralCybersec/PostInstallHUB
 - **Product owner:** Matheus
 - **Technical owner:** Matheus
 - **Target release:** ASAP (MVP)

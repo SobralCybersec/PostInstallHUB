@@ -32,7 +32,7 @@ supersedes: null
 | dnf | The package manager for Fedora. Replaced yum. Used in `scripts/linux/fedora.sh`. | yum — dnf is the current tool; yum is legacy | Fedora project |
 | winget | The Windows Package Manager CLI. Used in `scripts/windows/setup.cmd` to install packages on Windows 10/11. | Chocolatey, Scoop — third-party alternatives; winget is the Microsoft-native tool | Microsoft |
 | tweak | A system-level configuration change applied after package installation. Examples: setting zsh as the default shell (`chsh`), applying Hyprland-specific config on Omarchy. Not a package install. | Package installation — tweaks happen after packages are in place | Project definition |
-| curl one-liner | The single command a user runs to start PostInstallHUB: `curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/main/install.sh \| bash` | A full installer with a GUI or interactive prompt | Project definition |
+| curl one-liner | The single command a user runs to start PostInstallHUB: `curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/main/install.sh \| bash` | A full installer with a GUI or interactive prompt | Project definition |
 
 ## Acronyms
 

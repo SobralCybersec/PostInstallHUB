@@ -38,9 +38,9 @@ supersedes: null
 3. Update `README.md` to point the stable curl URL back to the last good tag:
    ```bash
    # Was:
-   curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/v1.0.0/install.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/v1.0.0/install.sh | bash
    # Now:
-   curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/v0.9.0/install.sh | bash
+   curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/v0.9.0/install.sh | bash
    ```
 4. Push the README update to `main`.
 5. Fix the bug on a branch, run all checks, then tag a new patch release (e.g. `v1.0.1`).
@@ -53,7 +53,7 @@ Users can always pin to a specific version themselves:
 
 ```bash
 # Pin to a known-good version
-curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/v0.9.0/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/v0.9.0/install.sh | bash
 ```
 
 ---

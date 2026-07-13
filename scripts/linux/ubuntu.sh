@@ -17,12 +17,16 @@
 #   UBUNTU_DEBLOAT=1   — remove common pre-installed bloatware (GNOME-focused)
 #   UBUNTU_SNAP=1      — install Snap daemon + snap apps
 #   UBUNTU_NVIDIA=1    — install NVIDIA proprietary drivers (ubuntu-drivers)
-#   POSTINSTALL_YES=1  — non-interactive (skip all prompts)
+#   POSTINSTALL_YES=1  — non-interactive (skip all prompts); skips dotfiles
+#   POSTINSTALL_DOTFILES=none|jakoolit|caelestia
+#     jakoolit   — Hyprland desktop (LinuxBeginnings/Hyprland-Dots, Ubuntu 24.04–26.04)
+#     caelestia  — Quickshell Hyprland desktop (via Nix flake)
 # =============================================================================
 set -euo pipefail
 
 _UBUNTU_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${_UBUNTU_SCRIPT_DIR}/common.sh"
+source "${_UBUNTU_SCRIPT_DIR}/dotfiles.sh"
 
 # ============================================================================
 # Ubuntu-based OS detection
@@ -457,6 +461,8 @@ run_install() {
   if [[ "${UBUNTU_NVIDIA:-0}" == "1" ]]; then
     _step_nvidia
   fi
+
+  step_dotfiles
 
   echo ""
   log_success "All automated steps complete!"

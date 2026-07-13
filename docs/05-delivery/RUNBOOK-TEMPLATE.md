@@ -186,7 +186,7 @@ curl -fsSL https://github.com -o /dev/null && echo GitHub reachable
 ## Escalation
 
 - Primary: Matheus (solo project — no escalation chain)
-- For bugs: open a GitHub Issue at `github.com/matheusgomescosta/PostInstallHUB/issues`
+- For bugs: open a GitHub Issue at `github.com/SobralCybersec/PostInstallHUB/issues`
 - Include: OS (`cat /etc/os-release`), script version (tag), full terminal output
 
 ## Rollback

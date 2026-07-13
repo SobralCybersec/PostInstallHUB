@@ -21,7 +21,7 @@ PostInstallHUB is a **solo project**. Matheus owns everything. There is no team,
 
 ## Repository
 
-- **GitHub:** [github.com/matheusgomescosta/PostInstallHUB](https://github.com/matheusgomescosta/PostInstallHUB)
+- **GitHub:** [github.com/SobralCybersec/PostInstallHUB](https://github.com/SobralCybersec/PostInstallHUB)
 - **Sole maintainer:** Matheus
 - **External PRs:** not accepted
 

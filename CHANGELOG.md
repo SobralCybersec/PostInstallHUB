@@ -45,6 +45,6 @@ Versioning: [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)
 - `tests/test_ubuntu.sh`, `test_arch.sh`, `test_fedora.sh`, `test_omarchy.sh`
 
 <!--
-[Unreleased]: https://github.com/matheusgomescosta/PostInstallHUB/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/matheusgomescosta/PostInstallHUB/releases/tag/v0.1.0
+[Unreleased]: https://github.com/SobralCybersec/PostInstallHUB/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/SobralCybersec/PostInstallHUB/releases/tag/v0.1.0
 -->

@@ -19,7 +19,7 @@ supersedes: null
 
 | Field | Value |
 |---|---|
-| Repository | `https://github.com/matheusgomescosta/PostInstallHUB` |
+| Repository | `https://github.com/SobralCybersec/PostInstallHUB` |
 | Product owner | Matheus |
 | Technical owner | Matheus |
 | Current phase | MVP |

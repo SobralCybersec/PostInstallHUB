@@ -1,0 +1,11 @@
+# Files
+
+AGENTS.md
+CLAUDE.md
+ALL-TEMPLATES.md
+
+docs/*
+design/*
+
+.pi
+.codegraph

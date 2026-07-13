@@ -37,7 +37,7 @@ supersedes: null
 
 ### Main flow
 
-1. User runs `curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/main/install.sh | bash`
+1. User runs `curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/main/install.sh | bash`
 2. `install.sh` creates lock file at `/tmp/postinstallhub.lock`
 3. Script reads `/etc/os-release` and identifies the distro
 4. Backup warning printed for any existing config files; user presses Enter to continue

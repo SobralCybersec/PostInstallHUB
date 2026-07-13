@@ -10,11 +10,18 @@
 #
 # Based on: Kalyan Dev's Kali 2025.2 setup guide
 # Adapted to PostInstallHUB standards: idempotent · logged · safe
+#
+# Optional env flags:
+#   POSTINSTALL_DOTFILES=none|zerodaygym|caelestia
+#     zerodaygym  — i3-gaps Kali security desktop (Kali-only, recommended)
+#     caelestia   — Quickshell Hyprland shell (via Nix)
+#   POSTINSTALL_YES=1  — non-interactive; skip all prompts; skip dotfiles
 # =============================================================================
 set -euo pipefail
 
 _KALI_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${_KALI_SCRIPT_DIR}/common.sh"
+source "${_KALI_SCRIPT_DIR}/dotfiles.sh"
 
 # ============================================================================
 # STEP 1 — System Update
@@ -429,6 +436,8 @@ run_install() {
   _step_python_libs
   _step_github_tools
   _step_go_tools
+
+  step_dotfiles
 
   echo ""
   log_success "All automated steps complete!"

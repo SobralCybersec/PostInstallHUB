@@ -19,12 +19,16 @@
 #   DEBIAN_GAMING=1        — install Steam · Heroic · MangoJuice via Flatpak
 #   DEBIAN_DEBLOAT=1       — remove LibreOffice, KMail, Juk, Dragon, etc.
 #   DEBIAN_ZSWAP=1         — enable ZSWAP kernel parameter (systemd-boot)
-#   POSTINSTALL_YES=1      — non-interactive, skip all prompts
+#   POSTINSTALL_YES=1      — non-interactive, skip all prompts; skips dotfiles
+#   POSTINSTALL_DOTFILES=none|jakoolit|caelestia
+#     jakoolit   — Hyprland desktop (LinuxBeginnings/Hyprland-Dots, Debian-supported)
+#     caelestia  — Quickshell Hyprland desktop (via Nix flake)
 # =============================================================================
 set -euo pipefail
 
 _DEBIAN_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${_DEBIAN_SCRIPT_DIR}/common.sh"
+source "${_DEBIAN_SCRIPT_DIR}/dotfiles.sh"
 
 # ============================================================================
 # Helpers
@@ -536,6 +540,8 @@ run_install() {
   if [[ "${DEBIAN_ZSWAP:-0}" == "1" ]]; then
     _step_zswap
   fi
+
+  step_dotfiles
 
   echo ""
   log_success "All automated steps complete!"

@@ -16,12 +16,16 @@
 #   FEDORA_NVIDIA=1    — install NVIDIA drivers (akmod-nvidia)
 #   FEDORA_CUDA=1      — also install CUDA support (requires FEDORA_NVIDIA=1)
 #   FEDORA_DNS=1       — configure Cloudflare DNS over TLS
-#   POSTINSTALL_YES=1  — non-interactive (no prompts)
+#   POSTINSTALL_YES=1  — non-interactive (no prompts); skips dotfiles
+#   POSTINSTALL_DOTFILES=none|jakoolit|caelestia
+#     jakoolit   — Hyprland desktop (LinuxBeginnings/Hyprland-Dots, Fedora-supported)
+#     caelestia  — Quickshell Hyprland desktop (via Nix flake)
 # =============================================================================
 set -euo pipefail
 
 _FEDORA_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${_FEDORA_SCRIPT_DIR}/common.sh"
+source "${_FEDORA_SCRIPT_DIR}/dotfiles.sh"
 
 # ============================================================================
 # Fedora-specific package helpers
@@ -558,6 +562,8 @@ run_install() {
   if [[ "${FEDORA_DNS:-0}" == "1" ]]; then
     _step_dns
   fi
+
+  step_dotfiles
 
   echo ""
   log_success "All automated steps complete!"

@@ -34,7 +34,7 @@ supersedes: null
 **Initial context:** Fresh Ubuntu 22.04 machine with internet access and `sudo` rights; no lock file present.
 
 **Steps:**
-1. Run `curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/main/install.sh | bash`
+1. Run `curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/main/install.sh | bash`
 
 **Observable result:**
 - `/etc/os-release` is read by the script
@@ -184,7 +184,7 @@ supersedes: null
 **Initial context:** Minimal fresh OS image with only `curl` installed; no `git`, `make`, `python`, or other build tools present.
 
 **Steps:**
-1. Run `curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/main/install.sh | bash`
+1. Run `curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/main/install.sh | bash`
 
 **Observable result:**
 - `install.sh` downloads and begins execution without requiring any tool beyond `curl` / `bash`

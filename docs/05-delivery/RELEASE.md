@@ -78,7 +78,7 @@ git push origin main
 git push origin vX.Y.Z
 
 # 6. Create GitHub Release
-#    - Go to github.com/matheusgomescosta/PostInstallHUB/releases/new
+#    - Go to github.com/SobralCybersec/PostInstallHUB/releases/new
 #    - Select tag vX.Y.Z
 #    - Title: "PostInstallHUB vX.Y.Z"
 #    - Body: paste the CHANGELOG section for this version
@@ -86,7 +86,7 @@ git push origin vX.Y.Z
 # 7. Verify curl one-liner on fresh Docker container
 docker run --rm ubuntu:22.04 bash -c \
   "apt-get update -q && apt-get install -y -q curl && \
-   curl -fsSL https://raw.githubusercontent.com/matheusgomescosta/PostInstallHUB/vX.Y.Z/install.sh | bash"
+   curl -fsSL https://raw.githubusercontent.com/SobralCybersec/PostInstallHUB/vX.Y.Z/install.sh | bash"
 
 # 8. Update README stable URL if needed
 ```

@@ -23,7 +23,7 @@ No fixed dates. Phases are sequenced by dependency, not calendar. Each phase has
 
 **Deliverables:**
 
-- GitHub repo created: `matheusgomescosta/PostInstallHUB`
+- GitHub repo created: `SobralCybersec/PostInstallHUB`
 - `README.md`: project description, install command, supported platforms, what it does/doesn't do
 - `LICENSE`: MIT
 - `AGENTS.md`: universal agent operating rules (how Claude/Codex/Pi should work in this repo)

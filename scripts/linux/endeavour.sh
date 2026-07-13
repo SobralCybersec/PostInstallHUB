@@ -19,12 +19,16 @@
 #   ENDEAVOUR_WAYDROID=1  — install Waydroid (Android container)
 #   ENDEAVOUR_GAMING=1    — install Steam, Lutris, gamemode, GPU drivers
 #   ENDEAVOUR_FISH=1      — configure fisher plugin manager for fish
-#   POSTINSTALL_YES=1     — non-interactive (skip all prompts)
+#   POSTINSTALL_YES=1     — non-interactive (skip all prompts); skips dotfiles
+#   POSTINSTALL_DOTFILES=none|jakoolit|caelestia
+#     jakoolit   — Hyprland desktop (LinuxBeginnings/Hyprland-Dots, Arch-supported)
+#     caelestia  — Quickshell Hyprland desktop (yay: caelestia-shell-git, preferred)
 # =============================================================================
 set -euo pipefail
 
 _ENDEAVOUR_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${_ENDEAVOUR_SCRIPT_DIR}/common.sh"
+source "${_ENDEAVOUR_SCRIPT_DIR}/dotfiles.sh"
 
 # ============================================================================
 # OS family guard — require Arch-based distro
@@ -660,6 +664,8 @@ run_install() {
   if [[ "${ENDEAVOUR_GAMING:-0}" == "1" ]]; then
     _step_gaming
   fi
+
+  step_dotfiles
 
   echo ""
   log_success "All automated steps complete!"
