@@ -890,7 +890,7 @@ YAML
 # ---------------------------------------------------------------------------
 _write_header() {
   local distro="$1"
-  local flags="$2"
+  local flags_str="$2"
   local generated_date
   generated_date="$(date '+%Y-%m-%d %H:%M:%S')"
   local outbase
@@ -900,7 +900,7 @@ _write_header() {
   printf '# PostInstallHUB generated playbook\n'
   printf '# Generated : %s\n' "$generated_date"
   printf '# Distro    : %s\n' "$distro"
-  printf '# Flags     : %s\n' "$flags"
+  printf '# Flags     : %s\n' "$flags_str"
   printf '#\n'
   printf '# Run with  : ansible-playbook -i localhost, %s\n' "$outbase"
   printf '# Tags      : update, essential, flatpak, snap, nvidia, cuda, dns, docker,\n'

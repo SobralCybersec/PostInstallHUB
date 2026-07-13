@@ -220,6 +220,7 @@ run_config_tui() {
     )
   else
     rkeys=(none jakoolit caelestia)
+    # shellcheck disable=SC2034  # rdescs read by caller via nameref
     rdescs=(
       "Skip dotfiles"
       "Hyprland desktop (LinuxBeginnings/Hyprland-Dots)"

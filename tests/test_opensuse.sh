@@ -238,7 +238,9 @@ done
 echo -e "\n${CYAN}── lib/ double-source guards ──${NC}"
 for lib in colors lock backup; do
   (
+    # shellcheck source=/dev/null
     source "${_ROOT_DIR}/lib/${lib}.sh"
+    # shellcheck source=/dev/null
     source "${_ROOT_DIR}/lib/${lib}.sh"
     var="_$(echo "$lib" | tr '[:lower:]' '[:upper:]')_LOADED"
     [[ -n "${!var:-}" ]] \

@@ -6,6 +6,7 @@
 [[ -n "${_COLORS_LOADED:-}" ]] && return 0
 _COLORS_LOADED=1
 
+# shellcheck disable=SC2034  # vars sourced and used by scripts throughout the project
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'

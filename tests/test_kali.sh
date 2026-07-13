@@ -74,8 +74,8 @@ check_link "${HOME}/Wordlists"
 if [[ -L "${HOME}/Wordlists" ]]; then
   target="$(readlink "${HOME}/Wordlists")"
   [[ "$target" == "/usr/share/wordlists" ]] \
-    && _pass "~/Wordlists → /usr/share/wordlists" \
-    || _fail "~/Wordlists points to wrong target: ${target}"
+    && _pass "$HOME/Wordlists → /usr/share/wordlists" \
+    || _fail "$HOME/Wordlists points to wrong target: ${target}"
 fi
 
 # ── Step 7: Editors ───────────────────────────────────────────────────────

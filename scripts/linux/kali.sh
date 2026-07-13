@@ -68,7 +68,7 @@ _step_aliases() {
 
   local shell_rc="${HOME}/.zshrc"
   if [[ ! -f "$shell_rc" ]]; then
-    log_warning "~/.zshrc not found — falling back to ~/.bashrc"
+    log_warning "$HOME/.zshrc not found — falling back to $HOME/.bashrc"
     shell_rc="${HOME}/.bashrc"
   fi
 
@@ -142,7 +142,7 @@ _step_zsh_autosuggest() {
 
   local shell_rc="${HOME}/.zshrc"
   if [[ ! -f "$shell_rc" ]]; then
-    log_warning "~/.zshrc not found — skipping autosuggestions config block."
+    log_warning "$HOME/.zshrc not found — skipping autosuggestions config block."
     return 0
   fi
 
@@ -207,9 +207,9 @@ _step_wordlists() {
 
   # Symlink ~/Wordlists → /usr/share/wordlists (skip if already a dir the user made)
   if [[ -L "$symlink" ]]; then
-    log_info "~/Wordlists symlink already exists → $(readlink "$symlink")"
+    log_info "$HOME/Wordlists symlink already exists → $(readlink "$symlink")"
   elif [[ -d "$symlink" ]]; then
-    log_warning "~/Wordlists is a real directory — not replacing with symlink."
+    log_warning "$HOME/Wordlists is a real directory — not replacing with symlink."
   else
     ln -s /usr/share/wordlists "$symlink"
     log_success "Created ~/Wordlists → /usr/share/wordlists"
