@@ -1,0 +1,111 @@
+# ============================================================
+# PostInstallHUB — Code Quality
+# Runs on every push / PR that touches .sh files or CI YAML.
+# No Docker, no package installs. Target: < 5 min total.
+# Jobs: actionlint · bash -n · ShellCheck · shfmt
+# ============================================================
+name: Code Quality
+
+on:
+  push:
+    branches: ["**"]
+    paths:
+      - "**.sh"
+      - ".github/workflows/**"
+  pull_request:
+    paths:
+      - "**.sh"
+      - ".github/workflows/**"
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # ── 1. Workflow linting ──────────────────────────────────
+  actionlint:
+    name: actionlint
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: Install actionlint v1.7.12
+        run: |
+          curl -sSL \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz \
+            | tar -xz actionlint
+          sudo mv actionlint /usr/local/bin/actionlint
+          actionlint --version
+
+      - name: Run actionlint
+        run: actionlint -color .github/workflows/*.yml
+
+  # ── 2. Bash syntax parse ─────────────────────────────────
+  bash-syntax:
+    name: bash -n
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: Syntax-check all .sh files
+        run: |
+          errors=0
+          while IFS= read -r -d '' f; do
+            if ! bash -n "$f" 2>&1; then
+              echo "::error file=${f}::Syntax error in ${f}"
+              errors=$(( errors + 1 ))
+            fi
+          done < <(find . -name '*.sh' -not -path './.git/*' -print0)
+          if (( errors > 0 )); then
+            echo "::error::${errors} file(s) failed syntax check"
+            exit 1
+          fi
+          echo "All scripts passed bash -n ✓"
+
+  # ── 3. ShellCheck ────────────────────────────────────────
+  shellcheck:
+    name: ShellCheck
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: ShellCheck version
+        run: shellcheck --version
+
+      # shellcheck is pre-installed on ubuntu-24.04 runners
+      # --format=gcc → inline PR annotations
+      - name: Run ShellCheck (warning+)
+        run: |
+          find . -name '*.sh' -not -path './.git/*' -print0 \
+            | xargs -0 shellcheck \
+                --severity=warning \
+                --format=gcc \
+                --shell=bash
+
+  # ── 4. shfmt formatting ──────────────────────────────────
+  shfmt:
+    name: shfmt
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: Install shfmt v3.10.0
+        run: |
+          curl -sSL \
+            https://github.com/mvdan/sh/releases/download/v3.10.0/shfmt_v3.10.0_linux_amd64 \
+            -o /usr/local/bin/shfmt
+          chmod +x /usr/local/bin/shfmt
+          shfmt --version
+
+      # -d  → diff mode (exit 1 on any formatting violation)
+      # -i 2 → 2-space indent
+      # -ci → indent switch cases
+      - name: shfmt diff check
+        run: shfmt -d -i 2 -ci scripts/ lib/ install.sh

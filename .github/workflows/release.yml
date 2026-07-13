@@ -1,0 +1,178 @@
+# ============================================================
+# PostInstallHUB — Release
+# Triggered by semver tags: v0.1.0 / v1.2.3 / v0.2.0-rc1
+# Pipeline: quality-gate → distro-smoke → github-release
+# The release is created only when all smoke tests pass.
+# ============================================================
+name: Release
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-rc[0-9]+"
+
+permissions:
+  contents: write   # gh release create
+
+jobs:
+  # ── 1. Quality gate ──────────────────────────────────────
+  quality-gate:
+    name: Quality gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: bash -n all scripts
+        run: |
+          find . -name '*.sh' -not -path './.git/*' -print0 \
+            | xargs -0 bash -n
+          echo "Syntax gate passed ✓"
+
+      - name: ShellCheck (warning+)
+        run: |
+          find . -name '*.sh' -not -path './.git/*' -print0 \
+            | xargs -0 shellcheck --severity=warning --format=gcc --shell=bash
+
+      - name: Install shfmt v3.10.0
+        run: |
+          curl -sSL \
+            https://github.com/mvdan/sh/releases/download/v3.10.0/shfmt_v3.10.0_linux_amd64 \
+            -o /usr/local/bin/shfmt
+          chmod +x /usr/local/bin/shfmt
+
+      - name: shfmt diff check
+        run: shfmt -d -i 2 -ci scripts/ lib/ install.sh
+
+  # ── 2. Distro smoke matrix ───────────────────────────────
+  smoke:
+    name: "smoke / ${{ matrix.name }}"
+    needs: quality-gate
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: kali
+            image: kalilinux/kali-rolling
+            bootstrap: "apt-get update -qq && apt-get install -y bash curl sudo 2>/dev/null"
+            test: tests/test_kali.sh
+          - name: ubuntu
+            image: ubuntu:24.04
+            bootstrap: "apt-get update -qq && apt-get install -y bash curl sudo 2>/dev/null"
+            test: tests/test_ubuntu.sh
+          - name: debian
+            image: debian:trixie
+            bootstrap: "apt-get update -qq && apt-get install -y bash curl sudo 2>/dev/null"
+            test: tests/test_debian.sh
+          - name: arch
+            image: archlinux:latest
+            bootstrap: "pacman -Sy --noconfirm bash curl sudo 2>/dev/null"
+            test: tests/test_arch.sh
+          - name: fedora
+            image: fedora:41
+            bootstrap: "dnf install -y bash curl sudo 2>/dev/null"
+            test: tests/test_fedora.sh
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: Pull ${{ matrix.image }}
+        run: docker pull "${{ matrix.image }}"
+
+      - name: Smoke — ${{ matrix.name }}
+        run: |
+          docker run --rm \
+            --network host \
+            -v "$PWD:/src:ro" -w /src \
+            -e POSTINSTALL_YES=1 -e CI=true \
+            "${{ matrix.image }}" \
+            bash -c "${{ matrix.bootstrap }} && bash ${{ matrix.test }}"
+
+  # ── 3. Build + publish GitHub Release ────────────────────
+  release:
+    name: "GitHub Release ${{ github.ref_name }}"
+    needs: smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: Validate semver tag
+        run: |
+          TAG="${{ github.ref_name }}"
+          if ! [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$ ]]; then
+            echo "::error::Tag '${TAG}' does not match semver pattern vX.Y.Z or vX.Y.Z-rcN"
+            exit 1
+          fi
+          echo "Releasing ${TAG}"
+
+      - name: Build release archive + SHA256
+        run: |
+          TAG="${{ github.ref_name }}"
+          ARCHIVE="PostInstallHUB-${TAG}.tar.gz"
+
+          tar -czf "$ARCHIVE" \
+            install.sh \
+            scripts/ \
+            lib/ \
+            tests/ \
+            README.md \
+            LICENSE.md \
+            CHANGELOG.md
+
+          sha256sum "$ARCHIVE" > "${ARCHIVE}.sha256"
+          echo "ARCHIVE=${ARCHIVE}" >> "$GITHUB_ENV"
+          echo "Created ${ARCHIVE} ($(du -sh "$ARCHIVE" | cut -f1))"
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          TAG="${{ github.ref_name }}"
+          VERSION="${TAG#v}"   # strip leading v
+
+          # Extract block for this version: lines between ## [VERSION] and next ## [
+          awk "/^## \[${VERSION}\]/{found=1; next} found && /^## \[/{exit} found{print}" \
+            CHANGELOG.md > release_notes.md
+
+          if [[ ! -s release_notes.md ]]; then
+            printf "PostInstallHUB %s\n\nSee [CHANGELOG.md](CHANGELOG.md) for details.\n" \
+              "$TAG" > release_notes.md
+          fi
+
+          echo "Release notes:"
+          cat release_notes.md
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ github.ref_name }}"
+          PRERELEASE_FLAG=""
+          if [[ "$TAG" == *"-rc"* ]]; then
+            PRERELEASE_FLAG="--prerelease"
+          fi
+
+          gh release create "$TAG" \
+            --title "PostInstallHUB ${TAG}" \
+            --notes-file release_notes.md \
+            $PRERELEASE_FLAG \
+            "$ARCHIVE" \
+            "${ARCHIVE}.sha256"
+
+      - name: Summary
+        run: |
+          {
+            echo "## Release ${{ github.ref_name }} published"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| Archive | \`${ARCHIVE}\` |"
+            echo "| SHA256 | \`$(cat "${ARCHIVE}.sha256" | cut -d' ' -f1)\` |"
+            echo "| URL | https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }} |"
+          } >> "$GITHUB_STEP_SUMMARY"

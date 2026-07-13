@@ -1,0 +1,151 @@
+# ============================================================
+# PostInstallHUB — Performance
+# Weekly: times script execution across distro containers.
+# Also available via workflow_dispatch for manual runs.
+# Targets (from PROJECT-INTAKE.md):
+#   OS detection     < 1 s
+#   Full install     < 10 min
+#   Idempotent re-run < 2 min
+# ============================================================
+name: Performance
+
+on:
+  schedule:
+    - cron: "0 4 * * 1"
+      timezone: "Europe/Lisbon"
+  workflow_dispatch:
+    inputs:
+      distro:
+        description: "Single distro image to benchmark (leave blank = all)"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  # ── 1. bash -n parse speed ───────────────────────────────
+  parse-speed:
+    name: Parse speed (bash -n)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: Time bash -n on every script
+        run: |
+          {
+            echo "## Parse Speed Results"
+            echo ""
+            echo "| Script | Lines | Parse time (ms) |"
+            echo "|--------|-------|-----------------|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          total_ms=0
+          while IFS= read -r -d '' f; do
+            lines=$(wc -l < "$f")
+            s=$(date +%s%N)
+            bash -n "$f"
+            e=$(date +%s%N)
+            ms=$(( (e - s) / 1000000 ))
+            total_ms=$(( total_ms + ms ))
+            echo "| \`${f}\` | ${lines} | ${ms} |" >> "$GITHUB_STEP_SUMMARY"
+          done < <(find . -name '*.sh' -not -path './.git/*' -print0)
+
+          {
+            echo "| **TOTAL** | — | **${total_ms}** |"
+            echo ""
+            echo "> Target: all scripts parse in < 2 000 ms total"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "Total parse time: ${total_ms}ms"
+          if (( total_ms > 2000 )); then
+            echo "::warning::Total parse time ${total_ms}ms exceeds 2 000 ms target"
+          fi
+
+  # ── 2. OS detection speed in containers ──────────────────
+  os-detection:
+    name: "OS detection — ${{ matrix.name }}"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Ubuntu 24.04
+            image: ubuntu:24.04
+            bootstrap: "apt-get update -qq && apt-get install -y --no-install-recommends bash 2>/dev/null"
+          - name: Debian Trixie
+            image: debian:trixie
+            bootstrap: "apt-get update -qq && apt-get install -y --no-install-recommends bash 2>/dev/null"
+          - name: Fedora 41
+            image: fedora:41
+            bootstrap: "dnf install -y bash 2>/dev/null"
+          - name: Arch Linux
+            image: archlinux:latest
+            bootstrap: "pacman -Sy --noconfirm bash 2>/dev/null"
+          - name: Kali Linux
+            image: kalilinux/kali-rolling
+            bootstrap: "apt-get update -qq && apt-get install -y --no-install-recommends bash 2>/dev/null"
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: Pull ${{ matrix.image }}
+        run: docker pull "${{ matrix.image }}"
+
+      - name: "Time lib source + OS detection — ${{ matrix.name }}"
+        run: |
+          IMAGE="${{ matrix.image }}"
+          BOOTSTRAP="${{ matrix.bootstrap }}"
+
+          START_NS=$(date +%s%N)
+          docker run --rm \
+            -v "$PWD:/src:ro" -w /src \
+            "$IMAGE" \
+            bash -c "${BOOTSTRAP} && \
+              time bash -c 'source lib/colors.sh; source lib/lock.sh; echo detection_done'"
+          END_NS=$(date +%s%N)
+
+          ELAPSED_MS=$(( (END_NS - START_NS) / 1000000 ))
+          echo "**${{ matrix.name }}**: ${ELAPSED_MS} ms (includes docker overhead)" \
+            >> "$GITHUB_STEP_SUMMARY"
+
+          # Generous threshold to account for CI docker overhead (target is 1s on bare metal)
+          if (( ELAPSED_MS > 10000 )); then
+            echo "::warning::${{ matrix.name }} detection took ${ELAPSED_MS}ms (> 10 000 ms CI threshold)"
+          fi
+
+  # ── 3. Script complexity metrics ─────────────────────────
+  complexity:
+    name: Complexity metrics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.3.1
+
+      - name: Line count, function count, TODO density
+        run: |
+          {
+            echo "## Script Complexity"
+            echo ""
+            echo "| Script | Lines | Functions | TODOs |"
+            echo "|--------|-------|-----------|-------|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          warn_count=0
+          while IFS= read -r -d '' f; do
+            lines=$(wc -l < "$f")
+            funcs=$(grep -cE '^\s*\w+\(\)\s*\{' "$f" || echo 0)
+            todos=$(grep -cE 'TODO|FIXME|HACK|XXX' "$f" || echo 0)
+            echo "| \`${f}\` | ${lines} | ${funcs} | ${todos} |" >> "$GITHUB_STEP_SUMMARY"
+
+            if (( lines > 1000 )); then
+              echo "::warning file=${f}::${f} is ${lines} lines — consider splitting"
+              warn_count=$(( warn_count + 1 ))
+            fi
+          done < <(find scripts/ lib/ -name '*.sh' -print0)
+
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "> ${warn_count} file(s) exceed the 1 000-line soft limit" >> "$GITHUB_STEP_SUMMARY"
