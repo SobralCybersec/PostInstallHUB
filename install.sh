@@ -15,6 +15,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # --- Load lib ---
 source "${SCRIPT_DIR}/lib/colors.sh"
 source "${SCRIPT_DIR}/lib/lock.sh"
+source "${SCRIPT_DIR}/lib/tui.sh"
 
 # ---------------------------------------------------------------------------
 detect_os() {
@@ -37,6 +38,8 @@ main() {
   distro="$(detect_os)"
 
   echo -e "\n${BOLD}PostInstallHUB${NC} — OS detected: ${CYAN}${distro}${NC}\n"
+
+  run_config_tui "$distro"
 
   case "$distro" in
     kali)

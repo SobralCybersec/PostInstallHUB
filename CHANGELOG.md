@@ -19,6 +19,13 @@ Versioning: [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)
 
 ### Added
 
+- `lib/tui.sh` — interactive flag-configuration TUI (`run_config_tui`)
+  - Pure-bash numbered checkbox `[x]` + radio `[●]` menu; no external deps
+  - Distro-aware flag arrays: Ubuntu, Arch, Endeavour/CachyOS, Fedora, Debian, Kali
+  - Dotfiles radio: jakoolit · caelestia · zerodaygym (kali) · none (default)
+  - `POSTINSTALL_YES=1` skips TUI entirely (CI / batch mode)
+  - Exports selected env vars; shows 3-second summary before launch
+- `install.sh` — wired `run_config_tui "$distro"` before the distro `case` block
 - Complete spec documentation for all 60+ doc files
 - `CLAUDE.md` and `AGENTS.md` for AI coding assistant context
 - `docs/00-project/COCKPIT-BRIEF.md` rewritten for PostInstallHUB
