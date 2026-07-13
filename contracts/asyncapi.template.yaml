@@ -1,8 +1,0 @@
-# N/A — PostInstallHUB has no message broker, event stream, or async API.
-#
-# PostInstallHUB is a shell script collection. There are no producers,
-# consumers, channels, or domain events in the web-service sense.
-# Domain events (PackageInstalled, TweakApplied, etc.) are modeled in
-# docs/01-product/DOMAIN.md as conceptual events, not as published messages.
-#
-# This file is a placeholder from the project scaffold template and does not apply.

@@ -1,0 +1,10 @@
+{"duration_ms":0.0,"event":"command_start","invocation_id":"178177-1783964805144","meta":{"command":"check","json_output":true},"pid":178177,"status":"ok","timestamp_ms":1783964805144}
+{"duration_ms":1.58307,"event":"startup","invocation_id":"178177-1783964805144","meta":{"command":"check"},"pid":178177,"status":"ok","timestamp_ms":1783964805145}
+{"duration_ms":0.0,"event":"discover_files_result","invocation_id":"178177-1783964805144","meta":{"count":1},"pid":178177,"status":"ok","timestamp_ms":1783964805152}
+{"duration_ms":7.478006,"event":"discover_files","invocation_id":"178177-1783964805144","meta":{"globs":[]},"pid":178177,"status":"ok","timestamp_ms":1783964805153}
+{"duration_ms":9.124296000000001,"event":"command_finish","invocation_id":"178177-1783964805144","meta":{"command":"check","exit_code":1},"pid":178177,"status":"ok","timestamp_ms":1783964805154}
+{"duration_ms":0.0,"event":"command_start","invocation_id":"194585-1783965381603","meta":{"command":"check","json_output":true},"pid":194585,"status":"ok","timestamp_ms":1783965381603}
+{"duration_ms":1.322068,"event":"startup","invocation_id":"194585-1783965381603","meta":{"command":"check"},"pid":194585,"status":"ok","timestamp_ms":1783965381603}
+{"duration_ms":0.0,"event":"discover_files_result","invocation_id":"194585-1783965381603","meta":{"count":1},"pid":194585,"status":"ok","timestamp_ms":1783965381611}
+{"duration_ms":7.522448,"event":"discover_files","invocation_id":"194585-1783965381603","meta":{"globs":[]},"pid":194585,"status":"ok","timestamp_ms":1783965381611}
+{"duration_ms":9.126235999999999,"event":"command_finish","invocation_id":"194585-1783965381603","meta":{"command":"check","exit_code":1},"pid":194585,"status":"ok","timestamp_ms":1783965381613}
