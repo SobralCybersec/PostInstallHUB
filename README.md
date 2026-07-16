@@ -78,7 +78,7 @@ flowchart TD
     PK -->|"tui"| D[run_config_tui]
     GUI -->|preset chosen| D
     GUI -->|no GUI available| D
-    D --> F["Toggle flags [x] / [●]\nnumber keys 1–9"]
+    D --> F["Toggle flags · number keys 1–9"]
     F -->|Enter| E
     F -->|q| Z([exit 0])
     EXP --> E

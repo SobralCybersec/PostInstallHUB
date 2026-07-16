@@ -178,6 +178,7 @@ if [[ "$_IS_OPENSUSE" == true ]]; then
   # ── Step 2: Packman (optional) ────────────────────────────────────────
   if [[ "${OPENSUSE_PACKMAN:-0}" == "1" ]]; then
     echo -e "\n${CYAN}── Packman (OPENSUSE_PACKMAN=1) ──${NC}"
+    # shellcheck disable=SC2033  # zypper/sudo are shell stubs in test scope
     sudo zypper repos 2>/dev/null | grep -q "packman" \
       && _pass "Packman repo configured" \
       || _fail "Packman repo NOT configured"
@@ -186,6 +187,7 @@ if [[ "$_IS_OPENSUSE" == true ]]; then
   # ── Step 5: NVIDIA (optional) ─────────────────────────────────────────
   if [[ "${OPENSUSE_NVIDIA:-0}" == "1" ]]; then
     echo -e "\n${CYAN}── NVIDIA (OPENSUSE_NVIDIA=1) ──${NC}"
+    # shellcheck disable=SC2033  # zypper/sudo are shell stubs in test scope
     sudo zypper repos 2>/dev/null | grep -q "NVIDIA" \
       && _pass "NVIDIA repo configured" \
       || _fail "NVIDIA repo NOT configured"

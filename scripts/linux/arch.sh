@@ -717,7 +717,7 @@ _step_lts_kernel() {
     systemd-boot)
       log_info "systemd-boot: regenerating entries..."
       # Add lts entry if not present
-      if ! compgen -G "/boot/loader/entries/*lts*" > /dev/null 2>&1; then
+      if ! compgen -G "/boot/loader/entries/*lts*" >/dev/null 2>&1; then
         local stock_entry
         stock_entry="$(ls /boot/loader/entries/*.conf 2>/dev/null | head -1)"
         if [[ -n "$stock_entry" ]]; then

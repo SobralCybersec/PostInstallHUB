@@ -78,7 +78,7 @@ flowchart TD
     PK -->|"tui"| D[run_config_tui]
     GUI -->|preset escolhido| D
     GUI -->|sem GUI disponível| D
-    D --> F["Alternar flags [x] / [●]\nteclas numéricas 1–9"]
+    D --> F["Alternar flags · teclas numéricas 1–9"]
     F -->|Enter| E
     F -->|q| Z([sair 0])
     EXP --> E
