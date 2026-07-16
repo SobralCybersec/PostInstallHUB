@@ -126,36 +126,93 @@ function Invoke-Step2Winrift {
 function Invoke-Step3Bloat {
     Write-Step "Step 3 - Remove bloatware"
 
-    $appx = @(
-        'Microsoft.BingNews'
-        'Microsoft.BingWeather'
-        'Microsoft.GetHelp'
-        'Microsoft.Getstarted'
-        'Microsoft.MicrosoftOfficeHub'
-        'Microsoft.MicrosoftSolitaireCollection'
-        'Microsoft.People'
-        'Microsoft.WindowsFeedbackHub'
-        'Microsoft.XboxApp'
-        'Microsoft.XboxGameOverlay'
-        'Microsoft.XboxGamingOverlay'
-        'Microsoft.XboxIdentityProvider'
-        'Microsoft.ZuneMusic'
-        'Microsoft.ZuneVideo'
-        'Clipchamp.Clipchamp'
-        'MicrosoftCorporationII.MicrosoftFamily'
-    )
+    # ── Primary: Win11Debloat CLI (Raphire/Win11Debloat) ─────────────────────
+    Write-Info "Attempting Win11Debloat as primary engine ..."
+    $w11dSuccess = $false
+    try {
+        $w11dScript = irm 'https://debloat.raphi.re/'
+        & ([scriptblock]::Create($w11dScript)) `
+            -CLI `
+            -Silent `
+            -NoRestartExplorer `
+            -AppRemovalTarget AllUsers `
+            -RemoveApps `
+            -RemoveGamingApps `
+            -DisableTelemetry `
+            -DisableSuggestions `
+            -DisableLocationServices `
+            -DisableFindMyDevice `
+            -DisableSearchHistory `
+            -DisableEdgeAds `
+            -DisableDesktopSpotlight `
+            -DisableLockscreenTips `
+            -DisableSettings365Ads `
+            -DisableSettingsHome `
+            -DisableBing `
+            -DisableStoreSearchSuggestions `
+            -DisableSearchHighlights `
+            -DisableCopilot `
+            -DisableRecall `
+            -DisableClickToDo `
+            -DisableAISvcAutoStart `
+            -DisableEdgeAI `
+            -DisablePaintAI `
+            -DisableNotepadAI `
+            -ClearStart `
+            -DisableStartRecommended `
+            -RevertContextMenu `
+            -DisableMouseAcceleration `
+            -DisableStickyKeys `
+            -DisableFastStartup `
+            -DisableDeliveryOptimization `
+            -PreventUpdateAutoReboot `
+            -DisableAnimations `
+            -DisableTransparency `
+            -DisableWidgets `
+            -HideChat `
+            -HideSearchTb `
+            -ShowHiddenFolders `
+            -ShowKnownFileExt
+        Write-Ok "Win11Debloat completed successfully"
+        $w11dSuccess = $true
+    } catch {
+        Write-Warn "Win11Debloat unavailable or failed: $_ — falling back to manual removal"
+    }
 
-    foreach ($pkg in $appx) {
-        $found = Get-AppxPackage -Name $pkg -AllUsers -ErrorAction SilentlyContinue
-        if ($found) {
-            try {
-                $found | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
-                Write-Ok "Removed: $pkg"
-            } catch {
-                Write-Warn "Could not remove $pkg (may need admin): $_"
+    # ── Offline fallback: manual Remove-AppxPackage list ─────────────────────
+    if (-not $w11dSuccess) {
+        Write-Info "Running offline AppxPackage fallback ..."
+        $appx = @(
+            'Microsoft.BingNews'
+            'Microsoft.BingWeather'
+            'Microsoft.GetHelp'
+            'Microsoft.Getstarted'
+            'Microsoft.MicrosoftOfficeHub'
+            'Microsoft.MicrosoftSolitaireCollection'
+            'Microsoft.People'
+            'Microsoft.WindowsFeedbackHub'
+            'Microsoft.XboxApp'
+            'Microsoft.XboxGameOverlay'
+            'Microsoft.XboxGamingOverlay'
+            'Microsoft.XboxIdentityProvider'
+            'Microsoft.ZuneMusic'
+            'Microsoft.ZuneVideo'
+            'Clipchamp.Clipchamp'
+            'MicrosoftCorporationII.MicrosoftFamily'
+        )
+
+        foreach ($pkg in $appx) {
+            $found = Get-AppxPackage -Name $pkg -AllUsers -ErrorAction SilentlyContinue
+            if ($found) {
+                try {
+                    $found | Remove-AppxPackage -AllUsers -ErrorAction SilentlyContinue
+                    Write-Ok "Removed: $pkg"
+                } catch {
+                    Write-Warn "Could not remove $pkg (may need admin): $_"
+                }
+            } else {
+                Write-Info "Not present: $pkg"
             }
-        } else {
-            Write-Info "Not present: $pkg"
         }
     }
 }
@@ -280,6 +337,18 @@ function Invoke-Step6Gaming {
 
 # ── Step 7 — Summary ──────────────────────────────────────────────────────────
 
+function Invoke-Step8Activate {
+    Write-Host "`n== Step 8: Windows activation (MAS) ==" -ForegroundColor Cyan
+    Write-Info "Running Microsoft Activation Scripts (get.activated.win) ..."
+    try {
+        irm https://get.activated.win | iex
+        Write-Ok "Activation script finished."
+    } catch {
+        Write-Err "Activation script failed: $($_.Exception.Message)"
+        $script:Failed += 'Windows activation (MAS)'
+    }
+}
+
 function Invoke-Step7Summary {
     $line = '=' * 60
     Write-Host "`n$line" -ForegroundColor Cyan
@@ -306,7 +375,8 @@ function Invoke-Step7Summary {
     Write-Host "  2. WSL distro (after reboot if WSL was freshly installed):" -ForegroundColor Yellow
     Write-Host "       wsl --install -d Ubuntu" -ForegroundColor Gray
     Write-Host "       wsl --install -d kali-linux" -ForegroundColor Gray
-    Write-Host "  3. Windows activation: Settings -> System -> Activation" -ForegroundColor Yellow
+    Write-Host "  3. Windows activation (skipped unless WINDOWS_ACTIVATE=1):" -ForegroundColor Yellow
+    Write-Host "       irm https://get.activated.win | iex" -ForegroundColor Gray
     Write-Host "  4. BitLocker: Settings -> Privacy & security -> Device encryption" -ForegroundColor Yellow
     Write-Host "  5. Full winrift audit (if WINDOWS_TWEAKS was not set):" -ForegroundColor Yellow
     Write-Host "       irm https://raw.githubusercontent.com/emylfy/winrift/main/scripts/launch.ps1 | iex" -ForegroundColor Gray
@@ -319,17 +389,19 @@ if (-not $env:WINDOWS_TWEAKS)   { $env:WINDOWS_TWEAKS   = '0' }
 if (-not $env:WINDOWS_DEBLOAT)  { $env:WINDOWS_DEBLOAT  = '0' }
 if (-not $env:WINDOWS_DEV)      { $env:WINDOWS_DEV      = '0' }
 if (-not $env:WINDOWS_GAMING)   { $env:WINDOWS_GAMING   = '0' }
+if (-not $env:WINDOWS_ACTIVATE) { $env:WINDOWS_ACTIVATE = '0' }
 if (-not $env:POSTINSTALL_YES)  { $env:POSTINSTALL_YES  = '0' }
 
 Write-Host "PostInstallHUB - Windows 11 setup" -ForegroundColor Cyan
-Write-Host "Flags: TWEAKS=$($env:WINDOWS_TWEAKS)  DEBLOAT=$($env:WINDOWS_DEBLOAT)  DEV=$($env:WINDOWS_DEV)  GAMING=$($env:WINDOWS_GAMING)" -ForegroundColor Gray
+Write-Host "Flags: TWEAKS=$($env:WINDOWS_TWEAKS)  DEBLOAT=$($env:WINDOWS_DEBLOAT)  DEV=$($env:WINDOWS_DEV)  GAMING=$($env:WINDOWS_GAMING)  ACTIVATE=$($env:WINDOWS_ACTIVATE)" -ForegroundColor Gray
 
 Invoke-Step1Prerequisites
 Invoke-Step4Apps
 
-if ($env:WINDOWS_TWEAKS  -eq '1') { Invoke-Step2Winrift }
-if ($env:WINDOWS_DEBLOAT -eq '1') { Invoke-Step3Bloat   }
-if ($env:WINDOWS_DEV     -eq '1') { Invoke-Step5DevEnv  }
-if ($env:WINDOWS_GAMING  -eq '1') { Invoke-Step6Gaming  }
+if ($env:WINDOWS_TWEAKS   -eq '1') { Invoke-Step2Winrift }
+if ($env:WINDOWS_DEBLOAT  -eq '1') { Invoke-Step3Bloat   }
+if ($env:WINDOWS_DEV      -eq '1') { Invoke-Step5DevEnv  }
+if ($env:WINDOWS_GAMING   -eq '1') { Invoke-Step6Gaming  }
+if ($env:WINDOWS_ACTIVATE -eq '1') { Invoke-Step8Activate }
 
 Invoke-Step7Summary

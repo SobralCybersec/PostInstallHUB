@@ -327,6 +327,123 @@ _step_snap_apps() {
 }
 
 # ============================================================================
+# STEP (optional) — Remove Snap completely & restore native Firefox + GNOME SW
+# Guard:  UBUNTU_UNSNAP=1
+#
+# Safe on Ubuntu Desktop: Firefox is re-added via the official Mozilla APT
+# repo so the user never loses a browser; gnome-software is (re-)installed so
+# the Software Center keeps working after snap-store is gone.
+#
+# NOTE: mutually exclusive with UBUNTU_SNAP=1 — run_install() enforces this.
+# ============================================================================
+_step_unsnap() {
+  log_step "(opt) · Un-Snap — remove snapd, restore Firefox (Mozilla APT)"
+  log_warning "UBUNTU_UNSNAP=1: all Snap packages + snapd will be purged non-fatally."
+
+  # ── a. Remove every installed snap (reverse install order) ───────────────
+  if is_installed snap; then
+    log_info "Iterating snap list (reverse order)…"
+    local _snap_list=""
+    _snap_list="$(snap list 2>/dev/null | tail -n +2 | awk '{print $1}' | tac 2>/dev/null)" || true
+    local _snap
+    while IFS= read -r _snap; do
+      [[ -z "$_snap" ]] && continue
+      log_info "  Removing snap: ${_snap}"
+      sudo snap remove --purge "$_snap" 2>/dev/null \
+        || log_warning "  snap remove --purge ${_snap} failed (continuing)"
+    done <<< "${_snap_list}"
+  else
+    log_info "snap binary not found — skipping snap removal loop."
+  fi
+
+  # ── b. Purge snapd + hold to prevent automatic reinstall ─────────────────
+  log_info "Purging snapd…"
+  sudo apt-get remove --purge -y snapd 2>/dev/null \
+    || log_warning "apt-get remove --purge snapd failed (continuing)"
+  sudo apt-mark hold snapd 2>/dev/null \
+    || log_warning "apt-mark hold snapd failed (continuing)"
+  log_success "snapd purged and held."
+
+  # ── c. Remove leftover ~/snap directory ──────────────────────────────────
+  if [[ -d "${HOME}/snap" ]]; then
+    log_info "Removing ${HOME}/snap…"
+    rm -rf "${HOME}/snap" 2>/dev/null \
+      || log_warning "Could not remove ${HOME}/snap (continuing)"
+  fi
+
+  # ── d. Pin snapd to Priority -10 — apt won't reinstall it ────────────────
+  local _nosnap_pref="/etc/apt/preferences.d/nosnap.pref"
+  if [[ ! -f "${_nosnap_pref}" ]]; then
+    log_info "Writing ${_nosnap_pref}…"
+    {
+      printf 'Package: snapd\nPin: release a=*\nPin-Priority: -10\n' \
+        | sudo tee "${_nosnap_pref}" > /dev/null
+    } || log_warning "Could not write ${_nosnap_pref} (continuing)"
+    [[ -f "${_nosnap_pref}" ]] \
+      && log_success "snapd pinned to Priority -10 via ${_nosnap_pref}."
+  else
+    log_info "Already present (skip): ${_nosnap_pref}"
+  fi
+
+  # ── e. Mozilla APT repo → native Firefox .deb ────────────────────────────
+  # Modern method per https://support.mozilla.org/en-US/kb/install-firefox-linux-apt
+  local _moz_keyring="/etc/apt/keyrings/packages.mozilla.org.asc"
+  local _moz_list="/etc/apt/sources.list.d/mozilla.list"
+  local _moz_pref="/etc/apt/preferences.d/mozilla-firefox"
+
+  # e1 — signing key (idempotent)
+  if [[ ! -f "${_moz_keyring}" ]]; then
+    log_info "Fetching Mozilla APT signing key → ${_moz_keyring}…"
+    sudo install -d -m 0755 /etc/apt/keyrings 2>/dev/null || true
+    {
+      wget -qO- "https://packages.mozilla.org/apt/repo-signing-key.gpg" \
+        | sudo tee "${_moz_keyring}" > /dev/null
+    } || log_warning "Could not fetch/write Mozilla signing key (continuing)"
+    [[ -f "${_moz_keyring}" ]] && log_success "Mozilla signing key saved."
+  else
+    log_info "Mozilla signing key already present: ${_moz_keyring}"
+  fi
+
+  # e2 — source list (idempotent)
+  if [[ ! -f "${_moz_list}" ]]; then
+    log_info "Writing Mozilla APT source list → ${_moz_list}…"
+    {
+      printf 'deb [signed-by=%s] https://packages.mozilla.org/apt mozilla main\n' \
+        "${_moz_keyring}" | sudo tee "${_moz_list}" > /dev/null
+    } || log_warning "Could not write Mozilla source list (continuing)"
+    [[ -f "${_moz_list}" ]] && log_success "Mozilla APT source added: ${_moz_list}"
+  else
+    log_info "Mozilla source list already present: ${_moz_list}"
+  fi
+
+  # e3 — apt preference: prefer packages.mozilla.org over Ubuntu repos at Priority 1000
+  if [[ ! -f "${_moz_pref}" ]]; then
+    log_info "Writing Mozilla apt preference (Priority 1000) → ${_moz_pref}…"
+    {
+      printf 'Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n' \
+        | sudo tee "${_moz_pref}" > /dev/null
+    } || log_warning "Could not write Mozilla apt preference (continuing)"
+    [[ -f "${_moz_pref}" ]] && log_success "Mozilla packages pinned to Priority 1000."
+  else
+    log_info "Mozilla apt preference already present: ${_moz_pref}"
+  fi
+
+  # e4 — update + install firefox from the Mozilla repo
+  log_info "apt-get update (picking up Mozilla repo)…"
+  sudo apt-get update -qq 2>/dev/null \
+    || log_warning "apt-get update failed (continuing)"
+  apt_install firefox \
+    || log_warning "firefox install from Mozilla APT failed (continuing)"
+
+  # ── f. Ensure gnome-software present (software center after snap-store gone) ──
+  apt_install gnome-software \
+    || log_warning "gnome-software install failed (continuing)"
+
+  log_success "Un-Snap complete — snapd removed; Firefox (Mozilla APT) + gnome-software installed."
+  log_info "A reboot is recommended to clear any lingering snapd mounts."
+}
+
+# ============================================================================
 # STEP 9 — System + package manager cleanup
 # ============================================================================
 _step_cleanup() {
@@ -433,7 +550,7 @@ run_install() {
 
   log_step "PostInstallHUB · Ubuntu / ${id}"
   echo -e "${DIM}User: $(whoami)  ·  Host: $(hostname)${NC}"
-  echo -e "${DIM}POSTINSTALL_YES=${POSTINSTALL_YES:-0}  ·  UBUNTU_DEBLOAT=${UBUNTU_DEBLOAT:-0}  ·  UBUNTU_SNAP=${UBUNTU_SNAP:-0}  ·  UBUNTU_NVIDIA=${UBUNTU_NVIDIA:-0}${NC}\n"
+  echo -e "${DIM}POSTINSTALL_YES=${POSTINSTALL_YES:-0}  ·  UBUNTU_DEBLOAT=${UBUNTU_DEBLOAT:-0}  ·  UBUNTU_SNAP=${UBUNTU_SNAP:-0}  ·  UBUNTU_UNSNAP=${UBUNTU_UNSNAP:-0}  ·  UBUNTU_NVIDIA=${UBUNTU_NVIDIA:-0}${NC}\n"
 
   # Always run
   _step_update
@@ -456,6 +573,17 @@ run_install() {
     _step_snap_apps
   else
     log_info "Snap skipped (set UBUNTU_SNAP=1 to enable)."
+  fi
+
+  # Opt-in: remove Snap entirely + restore native Firefox (mutually exclusive with UBUNTU_SNAP)
+  if [[ "${UBUNTU_UNSNAP:-0}" == "1" ]]; then
+    if [[ "${UBUNTU_SNAP:-0}" == "1" ]]; then
+      log_warning "UBUNTU_UNSNAP=1 and UBUNTU_SNAP=1 are mutually exclusive — skipping unsnap."
+    else
+      _step_unsnap
+    fi
+  else
+    log_info "Snap removal skipped (set UBUNTU_UNSNAP=1 to enable)."
   fi
 
   # Opt-in: NVIDIA

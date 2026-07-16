@@ -19,6 +19,7 @@
 #   ENDEAVOUR_WAYDROID=1  — install Waydroid (Android container)
 #   ENDEAVOUR_GAMING=1    — install Steam, Lutris, gamemode, GPU drivers
 #   ENDEAVOUR_FISH=1      — configure fisher plugin manager for fish
+#   ENDEAVOUR_ZRAM=1      — zram compressed swap + earlyoom OOM killer
 #   POSTINSTALL_YES=1     — non-interactive (skip all prompts); skips dotfiles
 #   POSTINSTALL_DOTFILES=none|jakoolit|caelestia
 #     jakoolit   — Hyprland desktop (LinuxBeginnings/Hyprland-Dots, Arch-supported)
@@ -406,7 +407,7 @@ _ENDEAVOUR_PACKAGES=(
   git vim neovim
   tmux
   curl wget unzip p7zip
-  ark dolphin kate konsole
+  ark dolphin kate konsole ghostty
   yt-dlp aria2
   flameshot
   keepassxc
@@ -590,6 +591,62 @@ _step_gaming() {
 }
 
 # ============================================================================
+# STEP 13 — zram + earlyoom (optional — set ENDEAVOUR_ZRAM=1 to run)
+# ============================================================================
+_step_zram() {
+  log_step "13 · zram + earlyoom (ENDEAVOUR_ZRAM=1)"
+
+  # zram-generator — compressed in-RAM swap managed by systemd
+  pacman_install zram-generator \
+    || { log_warning "zram-generator install failed — skipping zram setup."; return 0; }
+
+  local zram_conf="/etc/systemd/zram-generator.conf"
+  if [[ -f "$zram_conf" ]] && grep -q '\[zram0\]' "$zram_conf"; then
+    log_info "zram-generator: ${zram_conf} already configured."
+  else
+    sudo tee "$zram_conf" >/dev/null <<'EOF'
+[zram0]
+zram-size = ram / 2
+compression-algorithm = zstd
+swap-priority = 100
+EOF
+    log_success "zram-generator: configured (ram/2, zstd, priority 100)."
+  fi
+
+  # Activate without reboot
+  if ! swapon --show 2>/dev/null | grep -q zram; then
+    sudo systemctl start systemd-zram-setup@zram0.service 2>/dev/null \
+      || log_warning "zram service start failed — will activate on next boot."
+  else
+    log_info "zram swap: already active."
+  fi
+
+  # Recommended sysctl tuning for zram (per zram-generator upstream docs)
+  local sysctl_conf="/etc/sysctl.d/99-zram.conf"
+  if [[ ! -f "$sysctl_conf" ]]; then
+    sudo tee "$sysctl_conf" >/dev/null <<'EOF'
+vm.swappiness = 180
+vm.watermark_boost_factor = 0
+vm.watermark_scale_factor = 125
+vm.page-cluster = 0
+EOF
+    sudo sysctl --system &>/dev/null \
+      || log_warning "sysctl --system failed — reboot to apply zram tuning."
+    log_success "zram sysctl tuning applied (swappiness=180)."
+  else
+    log_info "zram sysctl: ${sysctl_conf} already present — skipped."
+  fi
+
+  # earlyoom — kills worst-offender process before kernel OOM fires
+  pacman_install earlyoom \
+    && { service_enable_now earlyoom.service \
+         || log_warning "earlyoom.service enable failed — run: sudo systemctl enable --now earlyoom"; } \
+    || log_warning "earlyoom install failed — continuing without it."
+
+  log_success "zram + earlyoom configured."
+}
+
+# ============================================================================
 # Manual steps banner
 # ============================================================================
 _print_manual_steps() {
@@ -636,7 +693,7 @@ run_install() {
   log_step "PostInstallHUB · EndeavourOS / CachyOS"
   echo -e "${DIM}User: $(whoami)  ·  Host: $(hostname)${NC}"
   echo -e "${DIM}POSTINSTALL_YES=${POSTINSTALL_YES:-0}  ·  ENDEAVOUR_GAMING=${ENDEAVOUR_GAMING:-0}  ·  ENDEAVOUR_PLYMOUTH=${ENDEAVOUR_PLYMOUTH:-0}${NC}"
-  echo -e "${DIM}ENDEAVOUR_WAYDROID=${ENDEAVOUR_WAYDROID:-0}  ·  ENDEAVOUR_FISH=${ENDEAVOUR_FISH:-0}${NC}\n"
+  echo -e "${DIM}ENDEAVOUR_WAYDROID=${ENDEAVOUR_WAYDROID:-0}  ·  ENDEAVOUR_FISH=${ENDEAVOUR_FISH:-0}  ·  ENDEAVOUR_ZRAM=${ENDEAVOUR_ZRAM:-0}${NC}\n"
 
   # Core steps — always run
   _step_update
@@ -660,6 +717,10 @@ run_install() {
 
   if [[ "${ENDEAVOUR_GAMING:-0}" == "1" ]]; then
     _step_gaming
+  fi
+
+  if [[ "${ENDEAVOUR_ZRAM:-0}" == "1" ]]; then
+    _step_zram
   fi
 
   step_dotfiles

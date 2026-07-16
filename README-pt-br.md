@@ -127,7 +127,7 @@ flowchart TD
 
 | Preset | Desktop | Alvo | Observações |
 |---|---|---|---|
-| `jakoolit` | Hyprland | Todas as distros incl. NixOS | [LinuxBeginnings/Hyprland-Dots](https://github.com/JaKooLit/Hyprland-Dots) |
+| `jakoolit` | Hyprland | Todas as distros incl. NixOS | [LinuxBeginnings/Hyprland-Dots](https://github.com/LinuxBeginnings/Hyprland-Dots) |
 | `caelestia` | Quickshell + Hyprland | Todas as distros | AUR (Arch/Endeavour) ou `nix run` |
 | `zerodaygym` | i3-gaps | **Apenas Kali** | Desktop de segurança, módulos HTB/VPN |
 | `none` | — | Padrão | Pular dotfiles completamente |
@@ -226,12 +226,15 @@ scripts\windows\setup.cmd
 | `UBUNTU_NVIDIA=1` | Instalar drivers NVIDIA proprietários | `0` |
 | `UBUNTU_DEBLOAT=1` | Remover bloatware pré-instalado | `0` |
 | `UBUNTU_SNAP=1` | Habilitar daemon Snap + apps | `0` |
+| `UBUNTU_UNSNAP=1` | Remover Snap + `snapd`, restaurar Firefox via APT Mozilla (exclui `UBUNTU_SNAP`) | `0` |
 | `ARCH_DOCKER=1` | Instalar Docker + adicionar usuário ao grupo | `0` |
 | `ARCH_LTS=1` | Instalar kernel LTS (`linux-lts`) | `0` |
+| `ARCH_ZRAM=1` | Habilitar zram (`zram-generator`) + `earlyoom` | `0` |
 | `ENDEAVOUR_GAMING=1` | Steam · Lutris · GameMode · drivers GPU | `0` |
 | `ENDEAVOUR_PLYMOUTH=1` | Animação de boot Plymouth | `0` |
 | `ENDEAVOUR_WAYDROID=1` | Waydroid (contêiner Android) | `0` |
 | `ENDEAVOUR_FISH=1` | Configuração completa do Fish via `lib/shells.sh` | `0` |
+| `ENDEAVOUR_ZRAM=1` | Habilitar zram (`zram-generator`) + `earlyoom` | `0` |
 | `FEDORA_NVIDIA=1` | Drivers NVIDIA (`akmod-nvidia`) | `0` |
 | `FEDORA_CUDA=1` | Suporte CUDA (requer `FEDORA_NVIDIA=1`) | `0` |
 | `FEDORA_DNS=1` | Cloudflare DNS over TLS | `0` |
@@ -447,27 +450,27 @@ Cada script de distro exporta uma única função `run_install()`. Todos os scri
 ```mermaid
 graph LR
     I([install.sh]) --> D[detect_os]
-    D -->|kali|      K[kali.sh]
-    D -->|ubuntu|    U[ubuntu.sh]
-    D -->|debian|    DE[debian.sh]
-    D -->|arch|      A[arch.sh]
+    D -->|kali| K[kali.sh]
+    D -->|ubuntu| U[ubuntu.sh]
+    D -->|debian| DE[debian.sh]
+    D -->|arch| A[arch.sh]
     D -->|endeavour| E[endeavour.sh]
-    D -->|fedora|    F[fedora.sh]
-    D -->|opensuse|  OS[opensuse.sh]
-    D -->|nixos|     NX[nixos.sh]
-    D -->|windows|   W[setup.ps1]
+    D -->|fedora| F[fedora.sh]
+    D -->|opensuse| OS[opensuse.sh]
+    D -->|nixos| NX[nixos.sh]
+    D -->|windows| W[setup.ps1]
 
     K  & U & DE & A & E & F & OS & NX --> C[common.sh]
     K  & U & DE & A & E & F & OS & NX --> DF[dotfiles.sh]
     E  --> SH[shells.sh]
 
     C  --> PKG[gerenciador de pacotes]
-    PKG -->|apt|    APT[(apt)]
+    PKG -->|apt| APT[(apt)]
     PKG -->|pacman| PAC[(pacman)]
-    PKG -->|dnf|    DNF[(dnf)]
+    PKG -->|dnf| DNF[(dnf)]
     PKG -->|zypper| ZYP[(zypper)]
-    PKG -->|nix|    NIX[(nix)]
-    W  -->|winget|  WIN[(winget/choco)]
+    PKG -->|nix| NIX[(nix)]
+    W  -->|winget| WIN[(winget/choco)]
 ```
 
 ### openSUSE (`scripts/linux/opensuse.sh`)
@@ -528,10 +531,10 @@ nix_config_has "# PostInstallHUB — flakes BEGIN" || nix_config_append ...
 flowchart LR
     A([etapa de instalação]) --> B{"pacote já\ninstalado?"}
     B -->|sim| C[log: já concluído]
-    B -->|não|  D[executar gerenciador de pacotes]
+    B -->|não| D[executar gerenciador de pacotes]
     D --> E{código de saída 0?}
     E -->|sim| F[log: OK]
-    E -->|não|  G([sair 1 — abortar])
+    E -->|não| G([sair 1 — abortar])
     C --> H([próxima etapa])
     F --> H
 ```
@@ -564,19 +567,19 @@ step_dotfiles() {
 ```mermaid
 flowchart TD
     A([step_dotfiles]) --> B{POSTINSTALL_DOTFILES}
-    B -->|jakoolit|   C[curl Distro-Hyprland.sh]
-    B -->|caelestia|  D{yay disponível?}
+    B -->|jakoolit| C[curl Distro-Hyprland.sh]
+    B -->|caelestia| D{yay disponível?}
     B -->|zerodaygym| E{distro == kali?}
-    B -->|none|       F([pular])
+    B -->|none| F([pular])
 
     C --> G[executa instalador por distro] --> Z([concluído])
 
     D -->|sim| H[yay caelestia-shell-git]
-    D -->|não|  I[instalar Nix · nix run]
+    D -->|não| I[instalar Nix · nix run]
     H & I --> Z
 
     E -->|sim| J[apt + i3-gaps + ferramentas HTB] --> Z
-    E -->|não|  K([aviso: somente Kali])
+    E -->|não| K([aviso: somente Kali])
 ```
 
 ### Lock File (`lib/lock.sh`)
@@ -808,6 +811,14 @@ ansible-playbook -i localhost, minha-maquina.yml
 # Pular confirmações
 $env:POSTINSTALL_YES = "1"
 .\scripts\windows\setup.ps1
+
+# Execução completa com todas as etapas opcionais
+$env:WINDOWS_TWEAKS   = "1"   # ajustes winrift (Invoke-Step2Winrift)
+$env:WINDOWS_DEBLOAT  = "1"   # Win11Debloat CLI + fallback offline (Invoke-Step3Bloat)
+$env:WINDOWS_DEV      = "1"   # ambiente de desenvolvimento (Invoke-Step5DevEnv)
+$env:WINDOWS_GAMING   = "1"   # stack de jogos (Invoke-Step6Gaming)
+$env:WINDOWS_ACTIVATE = "1"   # ativação do Windows via MAS — irm https://get.activated.win | iex
+.\scripts\windows\setup.ps1
 ```
 
 ---
@@ -1020,7 +1031,7 @@ O PostInstallHUB modifica pacotes do sistema e arquivos de configuração. Embor
 
 <h2 align="center">
 
-**Jakoolit Hyprland Dots**: [JaKooLit/Hyprland-Dots](https://github.com/JaKooLit/Hyprland-Dots) <img src="https://go-skill-icons.vercel.app/api/icons?i=linux&size=32" width="40" />
+**Jakoolit Hyprland Dots**: [LinuxBeginnings/Hyprland-Dots](https://github.com/LinuxBeginnings/Hyprland-Dots) (fork de [JaKooLit/Hyprland-Dots](https://github.com/JaKooLit/Hyprland-Dots)) <img src="https://go-skill-icons.vercel.app/api/icons?i=linux&size=32" width="40" />
 
 </h2>
 
@@ -1032,7 +1043,19 @@ O PostInstallHUB modifica pacotes do sistema e arquivos de configuração. Embor
 
 <h2 align="center">
 
-**ZeroDayGym Kali Dots**: [ZeroDayGym/kali-i3gaps](https://github.com/ZeroDayGym/kali-i3gaps) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+**ZerodayGym Kali Dots**: [zerodaygym/zerodaygym-kali-dotfiles](https://github.com/zerodaygym/zerodaygym-kali-dotfiles) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**Pós-Instalação EndeavourOS** (base do `endeavour.sh`): [BrandowLucas/Post-Install-Script](https://github.com/BrandowLucas/Post-Install-Script) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**Winrift** (ajustes Windows, encapsulado por `setup.ps1`): [emylfy/winrift](https://github.com/emylfy/winrift) <img src="https://go-skill-icons.vercel.app/api/icons?i=powershell&size=32" width="40" />
 
 </h2>
 
@@ -1084,10 +1107,67 @@ O PostInstallHUB modifica pacotes do sistema e arquivos de configuração. Embor
 
 </h2>
 
+<h1 align="center">Ferramentas & Projetos Upstream</h1>
+
+<p align="center">
+ <sub>Estes projetos de terceiros são instalados, clonados ou carregados pelos scripts de pós-instalação. Todos os direitos e créditos pertencem aos seus respectivos autores.</sub>
+</p>
+
+<h3 align="center">Ambiente de shell</h3>
+
+<p align="center">
+ <sub><b>Oh My Zsh</b> — <a href="https://github.com/ohmyzsh/ohmyzsh">ohmyzsh/ohmyzsh</a></sub><br>
+ <sub><b>Zim (zimfw)</b> — <a href="https://github.com/zimfw/zimfw">zimfw/zimfw</a></sub><br>
+ <sub><b>Starship</b> — <a href="https://github.com/starship/starship">starship/starship</a></sub><br>
+ <sub><b>zsh-autosuggestions</b> — <a href="https://github.com/zsh-users/zsh-autosuggestions">zsh-users/zsh-autosuggestions</a></sub><br>
+ <sub><b>zsh-syntax-highlighting</b> — <a href="https://github.com/zsh-users/zsh-syntax-highlighting">zsh-users/zsh-syntax-highlighting</a></sub>
+</p>
+
+<h3 align="center">Auxiliares de pacotes, Nix & temas</h3>
+
+<p align="center">
+ <sub><b>yay</b> (auxiliar AUR) — <a href="https://github.com/Jguer/yay">Jguer/yay</a></sub><br>
+ <sub><b>Instalador Determinate Nix</b> — <a href="https://github.com/DeterminateSystems/nix-installer">DeterminateSystems/nix-installer</a></sub><br>
+ <sub><b>Home Manager</b> — <a href="https://github.com/nix-community/home-manager">nix-community/home-manager</a></sub><br>
+ <sub><b>adw-gtk3</b> — <a href="https://github.com/lassekongo83/adw-gtk3">lassekongo83/adw-gtk3</a></sub><br>
+ <sub><b>nnn</b> — <a href="https://github.com/jarun/nnn">jarun/nnn</a></sub><br>
+ <sub><b>makeresolvedeb</b> (empacotamento DaVinci Resolve) — <a href="https://www.danieltufvesson.com/makeresolvedeb">Daniel Tufvesson</a></sub>
+</p>
+
+<h3 align="center">Ferramentas de segurança (preset Kali)</h3>
+
+<p align="center">
+ <sub><b>XSStrike</b> — <a href="https://github.com/s0md3v/XSStrike">s0md3v/XSStrike</a></sub><br>
+ <sub><b>tlshelpers</b> — <a href="https://github.com/hannob/tlshelpers">hannob/tlshelpers</a></sub><br>
+ <sub><b>shosubgo</b> — <a href="https://github.com/incogbyte/shosubgo">incogbyte/shosubgo</a></sub><br>
+ <sub><b>SubDomainizer</b> — <a href="https://github.com/nsonaniya2010/SubDomainizer">nsonaniya2010/SubDomainizer</a></sub><br>
+ <sub><b>dnmasscan</b> — <a href="https://github.com/rastating/dnmasscan">rastating/dnmasscan</a></sub><br>
+ <sub><b>dorks-eye</b> — <a href="https://github.com/BullsEye0/dorks-eye">BullsEye0/dorks-eye</a></sub><br>
+ <sub><b>blue_eye</b> — <a href="https://github.com/BullsEye0/blue_eye">BullsEye0/blue_eye</a></sub><br>
+ <sub><b>ghost_eye</b> — <a href="https://github.com/BullsEye0/ghost_eye">BullsEye0/ghost_eye</a></sub>
+</p>
+
+<p align="center">
+ <sub>Repositórios de pacotes das distribuições e mirrors de download de fornecedores usados pelos scripts (RPM Fusion, Packman, Flathub, Chaotic-AUR, deb-multimedia, NVIDIA, CUDA, Google, etc.) permanecem propriedade dos seus respectivos mantenedores e fornecedores.</sub>
+</p>
+
 <h1 align="center">Créditos</h1>
 
 <p align="center">
  Matheus Sobral<br>
  <a href="https://github.com/SobralCybersec">github.com/SobralCybersec</a><br>
  MIT © 2026
+</p>
+
+<p align="center">
+ <sub>Os presets de dotfiles incluídos são trabalho de seus autores originais:</sub><br>
+ <sub><code>jakoolit</code> — <a href="https://github.com/LinuxBeginnings/Hyprland-Dots">LinuxBeginnings/Hyprland-Dots</a> (fork de <a href="https://github.com/JaKooLit/Hyprland-Dots">JaKooLit/Hyprland-Dots</a>)</sub><br>
+ <sub><code>caelestia</code> — <a href="https://github.com/caelestia-dots/shell">caelestia-dots/shell</a></sub><br>
+ <sub><code>zerodaygym</code> — <a href="https://github.com/zerodaygym/zerodaygym-kali-dotfiles">zerodaygym/zerodaygym-kali-dotfiles</a></sub>
+</p>
+
+<p align="center">
+ <sub>Os scripts de pós-instalação se baseiam em:</sub><br>
+ <sub>Instalador EndeavourOS — <a href="https://github.com/BrandowLucas/Post-Install-Script">BrandowLucas/Post-Install-Script</a></sub><br>
+ <sub>Ajustes Windows — <a href="https://github.com/emylfy/winrift">emylfy/winrift</a></sub>
 </p>

@@ -469,6 +469,17 @@ _ESSENTIAL_PACKAGES=(
 _step_essential_packages() {
   log_step "12 · Essential Packages"
   dnf_install "${_ESSENTIAL_PACKAGES[@]}"
+
+  # Ghostty terminal — available in Fedora repos on recent releases
+  if rpm -q ghostty &>/dev/null; then
+    log_info "Already installed: ghostty"
+  else
+    log_info "Installing ghostty terminal…"
+    sudo "$_DNF" install -y ghostty 2>/dev/null \
+      || log_warning "Ghostty not found in default repos." \
+                     "Install via COPR: sudo dnf copr enable pgdev/ghostty && sudo dnf install -y ghostty"
+  fi
+
   log_success "Essential packages installed."
 }
 
@@ -541,6 +552,10 @@ run_install() {
   log_step "PostInstallHUB · Fedora 44"
   echo -e "${DIM}User: $(whoami)  ·  Host: $(hostname)  ·  dnf: ${_DNF}${NC}"
   echo -e "${DIM}POSTINSTALL_YES=${POSTINSTALL_YES:-0}  ·  FEDORA_NVIDIA=${FEDORA_NVIDIA:-0}  ·  FEDORA_DNS=${FEDORA_DNS:-0}${NC}\n"
+
+  # Note: Fedora ships zram-generator by default — zram swap is already active.
+  # No FEDORA_ZRAM flag needed; run `swapon --show` to confirm /dev/zramN is present.
+  log_info "zram: Fedora enables zram-generator by default — swap is already compressed in RAM."
 
   # Core steps (always run)
   _step_rpmfusion

@@ -19,6 +19,41 @@ Versioning: [Semantic Versioning 2.0.0](https://semver.org/spec/v2.0.0.html)
 
 ### Added
 
+#### Memory management — zram + earlyoom
+- `scripts/linux/arch.sh` — `_step_zram()` gated by `ARCH_ZRAM=1` (default off)
+  - `zram-generator` config (`/etc/systemd/zram-generator.conf`: ram/2, zstd, priority 100)
+  - sysctl tuning (`/etc/sysctl.d/99-zram.conf`: swappiness=180) + `earlyoom` service
+  - All failures are non-fatal (`log_warning` + `return 0`); config writes idempotent
+- `scripts/linux/endeavour.sh` — `_step_zram()` gated by `ENDEAVOUR_ZRAM=1` (default off); identical logic
+- `scripts/linux/fedora.sh` — no flag; Fedora ships `zram-generator` by default (noted via `log_info`)
+- `lib/tui.sh` — `ARCH_ZRAM` / `ENDEAVOUR_ZRAM` checkboxes added to their distro cases
+
+#### Ubuntu Snap removal
+- `scripts/linux/ubuntu.sh` — `_step_unsnap()` gated by `UBUNTU_UNSNAP=1` (default off)
+  - Purges all snaps (reverse install order) + `snapd`, holds `snapd`, removes `~/snap`
+  - Pins `snapd` to Priority -10; restores Firefox via the official Mozilla APT repo; installs `gnome-software`
+  - Mutually exclusive with `UBUNTU_SNAP=1` (warn + skip, never aborts); all file writes idempotent
+- `lib/tui.sh` — `UBUNTU_UNSNAP` checkbox with mutual-exclusion note in its description
+
+#### Terminal — Ghostty
+- `scripts/linux/arch.sh` — `ghostty` added to `_CORE_PACKAGES`
+- `scripts/linux/endeavour.sh` — `ghostty` added to the essential package list
+- `scripts/linux/fedora.sh` — `ghostty` install with COPR (`pgdev/ghostty`) hint on failure (non-fatal)
+
+#### Hyprland dotfiles — HyprMod
+- `scripts/linux/dotfiles.sh` — HyprMod integration applied at all Hyprland preset exits (jakoolit + caelestia)
+
+### Changed
+
+#### Windows debloat engine
+- `scripts/windows/setup.ps1` — `Invoke-Step3Bloat` now runs **Win11Debloat** (`-CLI -Silent`) as the primary engine
+  - Removals + ~35 privacy/telemetry/UI tweaks via the Raphire/Win11Debloat CLI
+  - Original hand-rolled `Remove-AppxPackage` loop retained as an **offline fallback** (runs only if Win11Debloat throws)
+  - Excludes flags that conflict with other steps (`-DisableGameBarIntegration`, `-ForceRemoveEdge`, WSL)
+
+#### System info tool
+- `scripts/linux/opensuse.sh` — `neofetch` replaced with `fastfetch` (neofetch is unmaintained/archived)
+
 #### CLI flag overrides
 - `install.sh` — `_parse_cli_flags()` parses `--KEY=VALUE` / `--KEY` args **before** the TUI
   - Any env var the distro scripts read can be passed as a CLI flag

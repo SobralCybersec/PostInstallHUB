@@ -140,13 +140,13 @@ _step_packman() {
 # STEP 3 — Essential Packages
 # ============================================================================
 _ESSENTIAL_PACKAGES=(
-  curl git wget htop neofetch neovim ripgrep fd fzf bat eza zsh
+  curl git wget htop fastfetch neovim ripgrep fd fzf bat eza zoxide zsh
 )
 
 _step_essential() {
   log_step "3 · Essential Packages"
   zypper_install "${_ESSENTIAL_PACKAGES[@]}"
-  log_success "Essential packages installed."
+  log_success "Essential packages installed (fastfetch replaces deprecated neofetch)."
 }
 
 # ============================================================================

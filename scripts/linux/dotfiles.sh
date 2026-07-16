@@ -61,6 +61,7 @@ _dotfiles_jakoolit() {
 
   log_success "Jakoolit Hyprland-Dots installed"
   log_info "Post-install: reboot → select Hyprland at the login screen"
+  _install_hyprmod
 }
 
 # ── Preset: Caelestia (Quickshell desktop for Hyprland) ──────────────────────
@@ -80,6 +81,7 @@ _dotfiles_caelestia() {
     yay -S --needed --noconfirm caelestia-shell-git
     log_success "Caelestia installed via AUR"
     log_info "Start with: caelestia shell -d   (or: qs -c caelestia)"
+    _install_hyprmod
     return 0
   fi
 
@@ -112,6 +114,7 @@ _dotfiles_caelestia() {
 
   log_success "Caelestia launched via Nix"
   log_info "Re-run after reboot with: nix run github:caelestia-dots/shell#with-cli"
+  _install_hyprmod
 }
 
 # ── Preset: ZeroDayGym Kali i3-gaps security desktop ─────────────────────────
@@ -198,6 +201,78 @@ _dotfiles_zerodaygym() {
     log_error "ZeroDayGym installer exited with code ${exit_code}"
     return "$exit_code"
   fi
+}
+
+# ── HyprMod: GTK4/libadwaita live-settings GUI for Hyprland ──────────────────
+# Source:  https://github.com/BlueManCZ/hyprmod
+# License: GPL-3.0
+# Lua-config aware for Hyprland 0.55+; reads ~/.config/hypr/hyprland.conf and
+# any #source'd Lua fragments to provide a live-reload settings panel.
+# Clones into ~/.local/share/hyprmod (idempotent — pull if already present).
+# Never fatal: a failure logs a warning and returns 0 so the parent preset
+# continues normally.
+_install_hyprmod() {
+  local dest="${HOME}/.local/share/hyprmod"
+  local repo_url="https://github.com/BlueManCZ/hyprmod"
+
+  log_step "HyprMod › GTK4/libadwaita live-settings GUI for Hyprland"
+  log_info "Source: ${repo_url}"
+
+  # ── Install runtime dependencies via native package manager ──────────────
+  local distro_id
+  distro_id=$(grep -oP '(?<=^ID=).+' /etc/os-release 2>/dev/null | tr -d '"' || echo "unknown")
+
+  case "${distro_id}" in
+    arch | endeavouros | manjaro)
+      log_info "Installing HyprMod deps via pacman …"
+      sudo pacman -S --needed --noconfirm python python-gobject gtk4 libadwaita \
+        || log_warning "pacman dep install had errors — HyprMod may not run correctly"
+      ;;
+    fedora)
+      log_info "Installing HyprMod deps via dnf …"
+      sudo dnf install -y python3 python3-gobject gtk4 libadwaita \
+        || log_warning "dnf dep install had errors — HyprMod may not run correctly"
+      ;;
+    ubuntu | debian | linuxmint | pop)
+      log_info "Installing HyprMod deps via apt …"
+      sudo apt-get install -y python3 python3-gi python3-gi-cairo \
+        gir1.2-gtk-4.0 gir1.2-adw-1 \
+        || log_warning "apt dep install had errors — HyprMod may not run correctly"
+      ;;
+    opensuse* | sles)
+      log_info "Installing HyprMod deps via zypper …"
+      sudo zypper install -y python3 python3-gobject gtk4 libadwaita \
+        || log_warning "zypper dep install had errors — HyprMod may not run correctly"
+      ;;
+    nixos)
+      log_info "NixOS: add python3, python3Packages.pygobject3, gtk4, libadwaita to your config"
+      ;;
+    *)
+      log_warning "Distro '${distro_id}' not recognised — install Python 3.12+, GTK4, libadwaita manually"
+      ;;
+  esac
+
+  # ── Clone or update repo ──────────────────────────────────────────────────
+  if ! command -v git &>/dev/null; then
+    log_warning "git not found — cannot clone HyprMod; install git and re-run"
+    return 0
+  fi
+
+  if [[ -d "${dest}/.git" ]]; then
+    log_info "HyprMod already cloned → pulling latest …"
+    git -C "${dest}" pull --ff-only \
+      || log_warning "git pull failed in ${dest} — directory may be dirty; update manually"
+  else
+    log_info "Cloning HyprMod into ${dest} …"
+    mkdir -p "${HOME}/.local/share"
+    git clone --depth=1 "${repo_url}" "${dest}" \
+      || { log_warning "git clone failed — HyprMod not installed; clone manually from ${repo_url}"; return 0; }
+  fi
+
+  log_success "HyprMod ready at ${dest}"
+  echo ""
+  log_info "HyprMod requires: Python 3.12+, GTK4, libadwaita (installed above where detected)"
+  log_info "Launch:  python '${dest}/hyprmod.py'"
 }
 
 # ── Interactive preset selection ──────────────────────────────────────────────

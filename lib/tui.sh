@@ -136,32 +136,35 @@ run_config_tui() {
 
   case "$distro" in
     ubuntu | zorin | linuxmint | pop | elementary | neon)
-      bkeys+=(UBUNTU_NVIDIA UBUNTU_DEBLOAT UBUNTU_SNAP)
-      bvals+=(0 0 0)
+      bkeys+=(UBUNTU_NVIDIA UBUNTU_DEBLOAT UBUNTU_SNAP UBUNTU_UNSNAP)
+      bvals+=(0 0 0 0)
       bdescs+=(
         "Install NVIDIA proprietary drivers (ubuntu-drivers)"
         "Remove pre-installed bloatware (GNOME-focused)"
         "Enable Snap daemon + Snap apps"
+        "Remove Snap entirely; restore Firefox (Mozilla APT) + gnome-software  ⚠ mutually exclusive with UBUNTU_SNAP"
       )
       ;;
     arch | manjaro)
-      bkeys+=(ARCH_DOCKER ARCH_LTS)
-      bvals+=(0 0)
+      bkeys+=(ARCH_DOCKER ARCH_LTS ARCH_ZRAM)
+      bvals+=(0 0 0)
       bdescs+=(
         "Install Docker + add user to docker group"
         "Install LTS kernel (linux-lts)"
+        "zram compressed swap (ram/2, zstd) + earlyoom OOM killer"
       )
       ;;
     endeavouros | cachyos | garuda)
       bkeys+=(ENDEAVOUR_GAMING ENDEAVOUR_PLYMOUTH
-        ENDEAVOUR_WAYDROID ENDEAVOUR_FISH)
+        ENDEAVOUR_WAYDROID ENDEAVOUR_FISH ENDEAVOUR_ZRAM)
       bvals+=(0 0
-        0 0)
+        0 0 0)
       bdescs+=(
         "Steam · Lutris · GameMode · GPU drivers"
         "Plymouth boot animation"
         "Waydroid (Android container)"
         "Fisher plugin manager for fish"
+        "zram compressed swap (ram/2, zstd) + earlyoom OOM killer"
       )
       ;;
     fedora)
