@@ -1107,49 +1107,124 @@ O PostInstallHUB modifica pacotes do sistema e arquivos de configuração. Embor
 
 </h2>
 
-<h1 align="center">Ferramentas & Projetos Upstream</h1>
+<h2 align="center">
+
+**Oh My Zsh**: [ohmyzsh/ohmyzsh](https://github.com/ohmyzsh/ohmyzsh) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**Zim (zimfw)**: [zimfw/zimfw](https://github.com/zimfw/zimfw) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**Starship**: [starship/starship](https://github.com/starship/starship) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**zsh-autosuggestions**: [zsh-users/zsh-autosuggestions](https://github.com/zsh-users/zsh-autosuggestions) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**zsh-syntax-highlighting**: [zsh-users/zsh-syntax-highlighting](https://github.com/zsh-users/zsh-syntax-highlighting) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**yay** (auxiliar AUR): [Jguer/yay](https://github.com/Jguer/yay) <img src="https://go-skill-icons.vercel.app/api/icons?i=arch&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**Instalador Determinate Nix**: [DeterminateSystems/nix-installer](https://github.com/DeterminateSystems/nix-installer) <img src="https://go-skill-icons.vercel.app/api/icons?i=nix&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**Home Manager**: [nix-community/home-manager](https://github.com/nix-community/home-manager) <img src="https://go-skill-icons.vercel.app/api/icons?i=nix&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**adw-gtk3**: [lassekongo83/adw-gtk3](https://github.com/lassekongo83/adw-gtk3) <img src="https://go-skill-icons.vercel.app/api/icons?i=gtk&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**nnn**: [jarun/nnn](https://github.com/jarun/nnn) <img src="https://go-skill-icons.vercel.app/api/icons?i=linux&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**makeresolvedeb** (empacotamento DaVinci Resolve): [Daniel Tufvesson](https://www.danieltufvesson.com/makeresolvedeb) <img src="https://go-skill-icons.vercel.app/api/icons?i=linux&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**XSStrike** (preset Kali): [s0md3v/XSStrike](https://github.com/s0md3v/XSStrike) <img src="https://go-skill-icons.vercel.app/api/icons?i=python&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**tlshelpers** (preset Kali): [hannob/tlshelpers](https://github.com/hannob/tlshelpers) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**shosubgo** (preset Kali): [incogbyte/shosubgo](https://github.com/incogbyte/shosubgo) <img src="https://go-skill-icons.vercel.app/api/icons?i=go&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**SubDomainizer** (preset Kali): [nsonaniya2010/SubDomainizer](https://github.com/nsonaniya2010/SubDomainizer) <img src="https://go-skill-icons.vercel.app/api/icons?i=python&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**dnmasscan** (preset Kali): [rastating/dnmasscan](https://github.com/rastating/dnmasscan) <img src="https://go-skill-icons.vercel.app/api/icons?i=bash&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**dorks-eye** (preset Kali): [BullsEye0/dorks-eye](https://github.com/BullsEye0/dorks-eye) <img src="https://go-skill-icons.vercel.app/api/icons?i=python&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**blue_eye** (preset Kali): [BullsEye0/blue_eye](https://github.com/BullsEye0/blue_eye) <img src="https://go-skill-icons.vercel.app/api/icons?i=python&size=32" width="40" />
+
+</h2>
+
+<h2 align="center">
+
+**ghost_eye** (preset Kali): [BullsEye0/ghost_eye](https://github.com/BullsEye0/ghost_eye) <img src="https://go-skill-icons.vercel.app/api/icons?i=python&size=32" width="40" />
+
+</h2>
 
 <p align="center">
- <sub>Estes projetos de terceiros são instalados, clonados ou carregados pelos scripts de pós-instalação. Todos os direitos e créditos pertencem aos seus respectivos autores.</sub>
+ <sub>Estes projetos de terceiros são instalados, clonados ou carregados pelos scripts de pós-instalação. Todos os direitos e créditos pertencem aos seus respectivos autores. Repositórios de pacotes das distribuições e mirrors de download de fornecedores usados pelos scripts (RPM Fusion, Packman, Flathub, Chaotic-AUR, deb-multimedia, NVIDIA, CUDA, Google, etc.) permanecem propriedade dos seus respectivos mantenedores e fornecedores.</sub>
 </p>
 
-<h3 align="center">Ambiente de shell</h3>
-
-<p align="center">
- <sub><b>Oh My Zsh</b> — <a href="https://github.com/ohmyzsh/ohmyzsh">ohmyzsh/ohmyzsh</a></sub><br>
- <sub><b>Zim (zimfw)</b> — <a href="https://github.com/zimfw/zimfw">zimfw/zimfw</a></sub><br>
- <sub><b>Starship</b> — <a href="https://github.com/starship/starship">starship/starship</a></sub><br>
- <sub><b>zsh-autosuggestions</b> — <a href="https://github.com/zsh-users/zsh-autosuggestions">zsh-users/zsh-autosuggestions</a></sub><br>
- <sub><b>zsh-syntax-highlighting</b> — <a href="https://github.com/zsh-users/zsh-syntax-highlighting">zsh-users/zsh-syntax-highlighting</a></sub>
-</p>
-
-<h3 align="center">Auxiliares de pacotes, Nix & temas</h3>
-
-<p align="center">
- <sub><b>yay</b> (auxiliar AUR) — <a href="https://github.com/Jguer/yay">Jguer/yay</a></sub><br>
- <sub><b>Instalador Determinate Nix</b> — <a href="https://github.com/DeterminateSystems/nix-installer">DeterminateSystems/nix-installer</a></sub><br>
- <sub><b>Home Manager</b> — <a href="https://github.com/nix-community/home-manager">nix-community/home-manager</a></sub><br>
- <sub><b>adw-gtk3</b> — <a href="https://github.com/lassekongo83/adw-gtk3">lassekongo83/adw-gtk3</a></sub><br>
- <sub><b>nnn</b> — <a href="https://github.com/jarun/nnn">jarun/nnn</a></sub><br>
- <sub><b>makeresolvedeb</b> (empacotamento DaVinci Resolve) — <a href="https://www.danieltufvesson.com/makeresolvedeb">Daniel Tufvesson</a></sub>
-</p>
-
-<h3 align="center">Ferramentas de segurança (preset Kali)</h3>
-
-<p align="center">
- <sub><b>XSStrike</b> — <a href="https://github.com/s0md3v/XSStrike">s0md3v/XSStrike</a></sub><br>
- <sub><b>tlshelpers</b> — <a href="https://github.com/hannob/tlshelpers">hannob/tlshelpers</a></sub><br>
- <sub><b>shosubgo</b> — <a href="https://github.com/incogbyte/shosubgo">incogbyte/shosubgo</a></sub><br>
- <sub><b>SubDomainizer</b> — <a href="https://github.com/nsonaniya2010/SubDomainizer">nsonaniya2010/SubDomainizer</a></sub><br>
- <sub><b>dnmasscan</b> — <a href="https://github.com/rastating/dnmasscan">rastating/dnmasscan</a></sub><br>
- <sub><b>dorks-eye</b> — <a href="https://github.com/BullsEye0/dorks-eye">BullsEye0/dorks-eye</a></sub><br>
- <sub><b>blue_eye</b> — <a href="https://github.com/BullsEye0/blue_eye">BullsEye0/blue_eye</a></sub><br>
- <sub><b>ghost_eye</b> — <a href="https://github.com/BullsEye0/ghost_eye">BullsEye0/ghost_eye</a></sub>
-</p>
-
-<p align="center">
- <sub>Repositórios de pacotes das distribuições e mirrors de download de fornecedores usados pelos scripts (RPM Fusion, Packman, Flathub, Chaotic-AUR, deb-multimedia, NVIDIA, CUDA, Google, etc.) permanecem propriedade dos seus respectivos mantenedores e fornecedores.</sub>
-</p>
 
 <h1 align="center">Créditos</h1>
 
