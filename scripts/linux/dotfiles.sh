@@ -225,24 +225,24 @@ _install_hyprmod() {
   case "${distro_id}" in
     arch | endeavouros | manjaro)
       log_info "Installing HyprMod deps via pacman …"
-      sudo pacman -S --needed --noconfirm python python-gobject gtk4 libadwaita \
-        || log_warning "pacman dep install had errors — HyprMod may not run correctly"
+      sudo pacman -S --needed --noconfirm python python-gobject gtk4 libadwaita ||
+        log_warning "pacman dep install had errors — HyprMod may not run correctly"
       ;;
     fedora)
       log_info "Installing HyprMod deps via dnf …"
-      sudo dnf install -y python3 python3-gobject gtk4 libadwaita \
-        || log_warning "dnf dep install had errors — HyprMod may not run correctly"
+      sudo dnf install -y python3 python3-gobject gtk4 libadwaita ||
+        log_warning "dnf dep install had errors — HyprMod may not run correctly"
       ;;
     ubuntu | debian | linuxmint | pop)
       log_info "Installing HyprMod deps via apt …"
       sudo apt-get install -y python3 python3-gi python3-gi-cairo \
-        gir1.2-gtk-4.0 gir1.2-adw-1 \
-        || log_warning "apt dep install had errors — HyprMod may not run correctly"
+        gir1.2-gtk-4.0 gir1.2-adw-1 ||
+        log_warning "apt dep install had errors — HyprMod may not run correctly"
       ;;
     opensuse* | sles)
       log_info "Installing HyprMod deps via zypper …"
-      sudo zypper install -y python3 python3-gobject gtk4 libadwaita \
-        || log_warning "zypper dep install had errors — HyprMod may not run correctly"
+      sudo zypper install -y python3 python3-gobject gtk4 libadwaita ||
+        log_warning "zypper dep install had errors — HyprMod may not run correctly"
       ;;
     nixos)
       log_info "NixOS: add python3, python3Packages.pygobject3, gtk4, libadwaita to your config"
@@ -260,13 +260,16 @@ _install_hyprmod() {
 
   if [[ -d "${dest}/.git" ]]; then
     log_info "HyprMod already cloned → pulling latest …"
-    git -C "${dest}" pull --ff-only \
-      || log_warning "git pull failed in ${dest} — directory may be dirty; update manually"
+    git -C "${dest}" pull --ff-only ||
+      log_warning "git pull failed in ${dest} — directory may be dirty; update manually"
   else
     log_info "Cloning HyprMod into ${dest} …"
     mkdir -p "${HOME}/.local/share"
-    git clone --depth=1 "${repo_url}" "${dest}" \
-      || { log_warning "git clone failed — HyprMod not installed; clone manually from ${repo_url}"; return 0; }
+    git clone --depth=1 "${repo_url}" "${dest}" ||
+      {
+        log_warning "git clone failed — HyprMod not installed; clone manually from ${repo_url}"
+        return 0
+      }
   fi
 
   log_success "HyprMod ready at ${dest}"

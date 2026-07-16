@@ -756,8 +756,11 @@ _step_zram() {
   log_step "14 · zram + earlyoom (ARCH_ZRAM=1)"
 
   # zram-generator — compressed in-RAM swap managed by systemd
-  pacman_install zram-generator \
-    || { log_warning "zram-generator install failed — skipping zram setup."; return 0; }
+  pacman_install zram-generator ||
+    {
+      log_warning "zram-generator install failed — skipping zram setup."
+      return 0
+    }
 
   local zram_conf="/etc/systemd/zram-generator.conf"
   if [[ -f "$zram_conf" ]] && grep -q '\[zram0\]' "$zram_conf"; then
@@ -774,8 +777,8 @@ EOF
 
   # Activate without reboot
   if ! swapon --show 2>/dev/null | grep -q zram; then
-    sudo systemctl start systemd-zram-setup@zram0.service 2>/dev/null \
-      || log_warning "zram service start failed — will activate on next boot."
+    sudo systemctl start systemd-zram-setup@zram0.service 2>/dev/null ||
+      log_warning "zram service start failed — will activate on next boot."
   else
     log_info "zram swap: already active."
   fi
@@ -789,18 +792,18 @@ vm.watermark_boost_factor = 0
 vm.watermark_scale_factor = 125
 vm.page-cluster = 0
 EOF
-    sudo sysctl --system &>/dev/null \
-      || log_warning "sysctl --system failed — reboot to apply zram tuning."
+    sudo sysctl --system &>/dev/null ||
+      log_warning "sysctl --system failed — reboot to apply zram tuning."
     log_success "zram sysctl tuning applied (swappiness=180)."
   else
     log_info "zram sysctl: ${sysctl_conf} already present — skipped."
   fi
 
   # earlyoom — kills worst-offender process before kernel OOM fires
-  pacman_install earlyoom \
-    && { service_enable_now earlyoom.service \
-         || log_warning "earlyoom.service enable failed — run: sudo systemctl enable --now earlyoom"; } \
-    || log_warning "earlyoom install failed — continuing without it."
+  pacman_install earlyoom &&
+    { service_enable_now earlyoom.service ||
+      log_warning "earlyoom.service enable failed — run: sudo systemctl enable --now earlyoom"; } ||
+    log_warning "earlyoom install failed — continuing without it."
 
   log_success "zram + earlyoom configured."
 }

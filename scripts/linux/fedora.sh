@@ -475,9 +475,9 @@ _step_essential_packages() {
     log_info "Already installed: ghostty"
   else
     log_info "Installing ghostty terminal…"
-    sudo "$_DNF" install -y ghostty 2>/dev/null \
-      || log_warning "Ghostty not found in default repos." \
-                     "Install via COPR: sudo dnf copr enable pgdev/ghostty && sudo dnf install -y ghostty"
+    sudo "$_DNF" install -y ghostty 2>/dev/null ||
+      log_warning "Ghostty not found in default repos." \
+        "Install via COPR: sudo dnf copr enable pgdev/ghostty && sudo dnf install -y ghostty"
   fi
 
   log_success "Essential packages installed."
