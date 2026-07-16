@@ -83,15 +83,15 @@ flowchart TD
     F -->|q| Z([exit 0])
     EXP --> E
     E --> H{distro}
-    H -->|kali|       I[kali.sh]
-    H -->|ubuntu|     J[ubuntu.sh]
-    H -->|debian|     K[debian.sh]
-    H -->|arch|       L[arch.sh]
-    H -->|endeavour|  M[endeavour.sh]
-    H -->|fedora|     N[fedora.sh]
-    H -->|opensuse|   OS[opensuse.sh]
-    H -->|nixos|      NX[nixos.sh]
-    H -->|windows|    W[setup.ps1]
+    H -->|kali| I[kali.sh]
+    H -->|ubuntu| J[ubuntu.sh]
+    H -->|debian| K[debian.sh]
+    H -->|arch| L[arch.sh]
+    H -->|endeavour| M[endeavour.sh]
+    H -->|fedora| N[fedora.sh]
+    H -->|opensuse| OS[opensuse.sh]
+    H -->|nixos| NX[nixos.sh]
+    H -->|windows| W[setup.ps1]
     I & J & K & L & M & N & OS & NX --> P[step_dotfiles]
     W --> Q([done])
     P --> Q
